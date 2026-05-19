@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:FileSyncTracker.UI.ViewModels"
+        xmlns:views="using:FileSyncTracker.UI.Views"
+        xmlns:pages="using:FileSyncTracker.UI.Views.Pages"
+        x:Class="FileSyncTracker.UI.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{DynamicResource AppTitle}"
+        Width="960" Height="640"
+        MinWidth="800" MinHeight="500"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E2E">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Title Bar -->
+        <Border Grid.Row="0" Background="#181825" Padding="12,8">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{DynamicResource AppTitle}" FontSize="16" FontWeight="Bold" Foreground="#CDD6F4" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Panel Grid.Column="2"/>
+                <Button Grid.Column="3" Content="-" Width="32" Height="28" Background="Transparent" Foreground="#CDD6F4"
+                        Click="OnMinimizeClick"/>
+                <Button Grid.Column="4" Content="X" Width="32" Height="28" Background="Transparent" Foreground="#CDD6F4"
+                        Click="OnCloseClick"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="200,*">
+
+            <!-- Left Navigation -->
+            <Border Grid.Column="0" Background="#11111B" Padding="8">
+                <StackPanel Spacing="4">
+                    <Button Classes="nav-btn" Content="{DynamicResource NavDashboard}" Tag="Dashboard" Click="OnNavClick"/>
+                    <Button Classes="nav-btn" Content="{DynamicResource NavTasks}" Tag="Tasks" Click="OnNavClick"/>
+                    <Button Classes="nav-btn" Content="{DynamicResource NavSettings}" Tag="Settings" Click="OnNavClick"/>
+                    <Button Classes="nav-btn" Content="{DynamicResource NavLogs}" Tag="Logs" Click="OnNavClick"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Content Area -->
+            <Panel Grid.Column="1" x:Name="ContentPanel" Background="#1E1E2E"/>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="#181825" Padding="12,6">
+            <Grid ColumnDefinitions="*,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{DynamicResource StatusEverything}" Foreground="#6C7086" FontSize="11"/>
+                    <TextBlock Text="{Binding EverythingStatus}" Foreground="#6C7086" FontSize="11"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{DynamicResource StatusSyncthing}" Foreground="#6C7086" FontSize="11"/>
+                    <TextBlock Text="{Binding SyncthingStatus}" Foreground="#6C7086" FontSize="11"/>
+                </StackPanel>
+                <TextBlock Grid.Column="2" Text="{DynamicResource Version}" Foreground="#6C7086" FontSize="11"/>
+            </Grid>
+        </Border>
+    </Grid>
+
+    <Window.Styles>
+        <Style Selector="Button.nav-btn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#CDD6F4"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="Button.nav-btn:pointerover">
+            <Setter Property="Background" Value="#313244"/>
+        </Style>
+        <Style Selector="Button.nav-btn:selected">
+            <Setter Property="Background" Value="#5B6CF8"/>
+        </Style>
+    </Window.Styles>
+</Window>

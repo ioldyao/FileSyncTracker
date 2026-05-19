@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FileSyncTracker.UI.Controls.TaskCard">
+
+    <Border Background="#313244" CornerRadius="8" Padding="16" Margin="0,0,0,8">
+        <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
+            <TextBlock Grid.Column="0" Grid.RowSpan="3" Text="📁" FontSize="28"
+                       VerticalAlignment="Center" Margin="0,0,12,0"/>
+            <TextBlock Grid.Column="1" Grid.Row="0" Name="TaskName" FontSize="15" FontWeight="SemiBold"
+                       Foreground="#CDD6F4"/>
+            <TextBlock Grid.Column="1" Grid.Row="1" Name="TaskPath" FontSize="12" Foreground="#6C7086"
+                       TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
+            <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+                <Border Name="StatusBadge" CornerRadius="4" Padding="8,2">
+                    <TextBlock Name="StatusText" FontSize="11" Foreground="White"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

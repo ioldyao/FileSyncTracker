@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:FileSyncTracker.UI.ViewModels"
+             x:Class="FileSyncTracker.UI.Views.Pages.LogPage"
+             x:DataType="vm:LogViewModel">
+
+    <Border Padding="24">
+        <Grid RowDefinitions="Auto,*">
+            <TextBlock Grid.Row="0" Text="{DynamicResource LogsTitle}" FontSize="28" FontWeight="Bold" Foreground="#CDD6F4" Margin="0,0,0,16"/>
+
+            <Border Grid.Row="1" Background="#313244" CornerRadius="8" Padding="16">
+                <ListBox ItemsSource="{Binding LogEntries}"
+                         Background="Transparent" Foreground="#CDD6F4"
+                         FontFamily="Cascadia Code,Consolas" FontSize="12"/>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

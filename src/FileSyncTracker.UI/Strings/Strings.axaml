@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="FileSyncTracker.UI.Strings.Strings">
+
+    <!-- App -->
+    <x:String x:Key="AppTitle">FileSyncTracker</x:String>
+
+    <!-- Navigation -->
+    <x:String x:Key="NavDashboard">Dashboard</x:String>
+    <x:String x:Key="NavTasks">Tasks</x:String>
+    <x:String x:Key="NavSettings">Settings</x:String>
+    <x:String x:Key="NavLogs">Logs</x:String>
+
+    <!-- Dashboard -->
+    <x:String x:Key="DashboardTitle">Dashboard</x:String>
+    <x:String x:Key="TotalTasks">Total Tasks</x:String>
+    <x:String x:Key="Syncing">Syncing</x:String>
+    <x:String x:Key="Tracking">Tracking</x:String>
+    <x:String x:Key="RecentActivity">Recent Activity</x:String>
+    <x:String x:Key="LastSyncFormat">Last sync: {0:MM/dd HH:mm}</x:String>
+
+    <!-- Task List -->
+    <x:String x:Key="TaskListTitle">Tasks</x:String>
+    <x:String x:Key="AddTask">+ Add Task</x:String>
+    <x:String x:Key="SyncNow">Sync</x:String>
+    <x:String x:Key="Enable">On</x:String>
+    <x:String x:Key="Disable">Off</x:String>
+    <x:String x:Key="Delete">Delete</x:String>
+
+    <!-- Add Task -->
+    <x:String x:Key="AddTaskTitle">Add Task</x:String>
+    <x:String x:Key="SelectTaskType">Select Task Type</x:String>
+    <x:String x:Key="FolderType">Folder</x:String>
+    <x:String x:Key="SingleFileType">Single File</x:String>
+    <x:String x:Key="SelectPath">Select Path</x:String>
+    <x:String x:Key="TaskName">Task Name</x:String>
+    <x:String x:Key="LocalPath">Local Path</x:String>
+    <x:String x:Key="Browse">Browse...</x:String>
+    <x:String x:Key="RemoteConfig">Remote Configuration</x:String>
+    <x:String x:Key="RemoteTarget">Remote Target (e.g., server:/path)</x:String>
+    <x:String x:Key="SyncMode">Sync Mode</x:String>
+    <x:String x:Key="RealTime">Real-Time</x:String>
+    <x:String x:Key="Scheduled">Scheduled</x:String>
+    <x:String x:Key="CronExpression">Cron Expression (e.g., 0 */5 * * *)</x:String>
+    <x:String x:Key="Back">Back</x:String>
+    <x:String x:Key="Next">Next</x:String>
+    <x:String x:Key="Create">Create</x:String>
+
+    <!-- Settings -->
+    <x:String x:Key="SettingsTitle">Settings</x:String>
+    <x:String x:Key="Everything">Everything</x:String>
+    <x:String x:Key="EverythingPath">Everything64.dll Path</x:String>
+    <x:String x:Key="Syncthing">Syncthing</x:String>
+    <x:String x:Key="SyncthingPath">Syncthing.exe Path</x:String>
+    <x:String x:Key="SyncthingApiUrl">API URL</x:String>
+    <x:String x:Key="General">General</x:String>
+    <x:String x:Key="MinimizeToTray">Minimize to tray on close</x:String>
+    <x:String x:Key="AutoStart">Start with Windows</x:String>
+    <x:String x:Key="LogRetention">Log retention days:</x:String>
+    <x:String x:Key="SaveSettings">Save Settings</x:String>
+    <x:String x:Key="WebDavServers">WebDAV Servers</x:String>
+    <x:String x:Key="OneDriveAccounts">OneDrive Accounts</x:String>
+    <x:String x:Key="S3Servers">S3 Servers</x:String>
+    <x:String x:Key="Edit">Edit</x:String>
+    <x:String x:Key="Del">Del</x:String>
+    <x:String x:Key="Add">+ Add</x:String>
+    <x:String x:Key="Cancel">Cancel</x:String>
+    <x:String x:Key="Save">Save</x:String>
+    <x:String x:Key="Running">Running</x:String>
+    <x:String x:Key="NotRunning">Not Running</x:String>
+    <x:String x:Key="Checking">Checking...</x:String>
+    <x:String x:Key="Disconnected">Disconnected</x:String>
+    <x:String x:Key="Stopped">Stopped</x:String>
+
+    <!-- Logs -->
+    <x:String x:Key="LogsTitle">Logs</x:String>
+
+    <!-- Dialogs -->
+    <x:String x:Key="AddFolderTask">Add Folder Sync Task</x:String>
+    <x:String x:Key="AddFileTask">Add Single File Sync Task</x:String>
+    <x:String x:Key="LocalFolderPath">Local Folder Path</x:String>
+    <x:String x:Key="FilePath">File Path</x:String>
+
+    <!-- Storage -->
+    <x:String x:Key="StorageConfig">Storage Configuration</x:String>
+    <x:String x:Key="SelectBackupTargets">Select backup targets (multiple selection supported)</x:String>
+    <x:String x:Key="NoCloudConfigured">No cloud servers configured. Go to Settings to add WebDAV / OneDrive / S3 servers first.</x:String>
+    <x:String x:Key="SelectedTargets">Selected targets:</x:String>
+    <x:String x:Key="RemotePath">Remote Path (e.g., /backup)</x:String>
+
+    <!-- Status Bar -->
+    <x:String x:Key="StatusEverything">Everything:</x:String>
+    <x:String x:Key="StatusSyncthing">Syncthing:</x:String>
+    <x:String x:Key="Version">v1.0.0</x:String>
+
+    <!-- Status -->
+    <x:String x:Key="StatusIdle">Idle</x:String>
+    <x:String x:Key="StatusSyncing">Syncing</x:String>
+    <x:String x:Key="StatusTracking">Tracking</x:String>
+    <x:String x:Key="StatusError">Error</x:String>
+    <x:String x:Key="StatusDisabled">Disabled</x:String>
+</ResourceDictionary>

@@ -1,0 +1,102 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="FileSyncTracker.UI.Strings.StringsZhCN">
+
+    <!-- App -->
+    <x:String x:Key="AppTitle">FileSyncTracker</x:String>
+
+    <!-- Navigation -->
+    <x:String x:Key="NavDashboard">概览</x:String>
+    <x:String x:Key="NavTasks">任务</x:String>
+    <x:String x:Key="NavSettings">设置</x:String>
+    <x:String x:Key="NavLogs">日志</x:String>
+
+    <!-- Dashboard -->
+    <x:String x:Key="DashboardTitle">概览</x:String>
+    <x:String x:Key="TotalTasks">总任务数</x:String>
+    <x:String x:Key="Syncing">同步中</x:String>
+    <x:String x:Key="Tracking">追踪中</x:String>
+    <x:String x:Key="RecentActivity">最近活动</x:String>
+    <x:String x:Key="LastSyncFormat">上次同步: {0:MM/dd HH:mm}</x:String>
+
+    <!-- Task List -->
+    <x:String x:Key="TaskListTitle">任务列表</x:String>
+    <x:String x:Key="AddTask">+ 添加任务</x:String>
+    <x:String x:Key="SyncNow">同步</x:String>
+    <x:String x:Key="Enable">启用</x:String>
+    <x:String x:Key="Disable">禁用</x:String>
+    <x:String x:Key="Delete">删除</x:String>
+
+    <!-- Add Task -->
+    <x:String x:Key="AddTaskTitle">添加任务</x:String>
+    <x:String x:Key="SelectTaskType">选择任务类型</x:String>
+    <x:String x:Key="FolderType">文件夹</x:String>
+    <x:String x:Key="SingleFileType">单个文件</x:String>
+    <x:String x:Key="SelectPath">选择路径</x:String>
+    <x:String x:Key="TaskName">任务名称</x:String>
+    <x:String x:Key="LocalPath">本地路径</x:String>
+    <x:String x:Key="Browse">浏览...</x:String>
+    <x:String x:Key="RemoteConfig">远程配置</x:String>
+    <x:String x:Key="RemoteTarget">远程目标 (例如: server:/path)</x:String>
+    <x:String x:Key="SyncMode">同步模式</x:String>
+    <x:String x:Key="RealTime">实时</x:String>
+    <x:String x:Key="Scheduled">定时</x:String>
+    <x:String x:Key="CronExpression">Cron 表达式 (例如: 0 */5 * * *)</x:String>
+    <x:String x:Key="Back">上一步</x:String>
+    <x:String x:Key="Next">下一步</x:String>
+    <x:String x:Key="Create">创建</x:String>
+
+    <!-- Settings -->
+    <x:String x:Key="SettingsTitle">设置</x:String>
+    <x:String x:Key="Everything">Everything</x:String>
+    <x:String x:Key="EverythingPath">Everything64.dll 路径</x:String>
+    <x:String x:Key="Syncthing">Syncthing</x:String>
+    <x:String x:Key="SyncthingPath">Syncthing.exe 路径</x:String>
+    <x:String x:Key="SyncthingApiUrl">API 地址</x:String>
+    <x:String x:Key="General">常规</x:String>
+    <x:String x:Key="MinimizeToTray">关闭时最小化到托盘</x:String>
+    <x:String x:Key="AutoStart">开机自启动</x:String>
+    <x:String x:Key="LogRetention">日志保留天数:</x:String>
+    <x:String x:Key="SaveSettings">保存设置</x:String>
+    <x:String x:Key="WebDavServers">WebDAV 服务器</x:String>
+    <x:String x:Key="OneDriveAccounts">OneDrive 账户</x:String>
+    <x:String x:Key="S3Servers">S3 服务器</x:String>
+    <x:String x:Key="Edit">编辑</x:String>
+    <x:String x:Key="Del">删除</x:String>
+    <x:String x:Key="Add">+ 添加</x:String>
+    <x:String x:Key="Cancel">取消</x:String>
+    <x:String x:Key="Save">保存</x:String>
+    <x:String x:Key="Running">运行中</x:String>
+    <x:String x:Key="NotRunning">未运行</x:String>
+    <x:String x:Key="Checking">检测中...</x:String>
+    <x:String x:Key="Disconnected">未连接</x:String>
+    <x:String x:Key="Stopped">已停止</x:String>
+
+    <!-- Logs -->
+    <x:String x:Key="LogsTitle">日志</x:String>
+
+    <!-- Dialogs -->
+    <x:String x:Key="AddFolderTask">添加文件夹同步任务</x:String>
+    <x:String x:Key="AddFileTask">添加单文件同步任务</x:String>
+    <x:String x:Key="LocalFolderPath">本地文件夹路径</x:String>
+    <x:String x:Key="FilePath">文件路径</x:String>
+
+    <!-- Storage -->
+    <x:String x:Key="StorageConfig">存储配置</x:String>
+    <x:String x:Key="SelectBackupTargets">选择备份目标（支持多选）</x:String>
+    <x:String x:Key="NoCloudConfigured">未配置云服务器。请先在设置中添加 WebDAV / OneDrive / S3 服务器。</x:String>
+    <x:String x:Key="SelectedTargets">已选择目标：</x:String>
+    <x:String x:Key="RemotePath">远程路径（如 /backup）</x:String>
+
+    <!-- Status Bar -->
+    <x:String x:Key="StatusEverything">Everything:</x:String>
+    <x:String x:Key="StatusSyncthing">Syncthing:</x:String>
+    <x:String x:Key="Version">v1.0.0</x:String>
+
+    <!-- Status -->
+    <x:String x:Key="StatusIdle">空闲</x:String>
+    <x:String x:Key="StatusSyncing">同步中</x:String>
+    <x:String x:Key="StatusTracking">追踪中</x:String>
+    <x:String x:Key="StatusError">错误</x:String>
+    <x:String x:Key="StatusDisabled">已禁用</x:String>
+</ResourceDictionary>

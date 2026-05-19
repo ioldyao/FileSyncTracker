@@ -1,0 +1,8 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="FileSyncTracker.UI.Controls.StatusBadge">
+
+    <Border Name="BadgeBorder" CornerRadius="4" Padding="8,2">
+        <TextBlock Name="BadgeText" FontSize="11" Foreground="White"/>
+    </Border>
+</UserControl>
