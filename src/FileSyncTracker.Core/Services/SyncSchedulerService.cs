@@ -105,29 +105,16 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
                             var service = GetCloudService(target.Type);
                             var remoteDir = target.RemotePath.TrimStart('/');
 
-                            // Check if remote file is newer than local before uploading
+                            // Skip if local file hasn't changed since last sync
                             if (task.Type == SyncTaskType.SingleFile && File.Exists(task.CurrentPath))
                             {
                                 var localTime = File.GetLastWriteTimeUtc(task.CurrentPath);
-                                var fileName = Path.GetFileName(task.CurrentPath);
-                                var remoteInfo = await service.GetFileInfoAsync(config, fileName);
-                                if (remoteInfo != null)
+                                var lastSync = task.LastSyncTime?.ToUniversalTime() ?? DateTime.MinValue;
+                                if (lastSync > DateTime.MinValue && localTime <= lastSync)
                                 {
-                                    var remoteUtc = remoteInfo.LastModified.Kind == DateTimeKind.Utc
-                                        ? remoteInfo.LastModified
-                                        : remoteInfo.LastModified.ToUniversalTime();
-                                    _logger.LogInformation("Timestamp check: Local(Utc)={LocalTime:u}, Remote(Raw)={RemoteRaw}, Remote(Utc)={RemoteUtc:u}, File={File}",
-                                        localTime, remoteInfo.LastModified, remoteUtc, fileName);
-                                    if (remoteUtc > localTime)
-                                    {
-                                        _logger.LogWarning("Skipping upload: remote is newer (Remote={RemoteUtc:u} > Local={LocalTime:u})",
-                                            remoteUtc, localTime);
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-                                    _logger.LogInformation("Timestamp check: Remote file not found for {File}, proceeding with upload", fileName);
+                                    _logger.LogInformation("Skipping upload: no changes since last sync (Local={LocalTime:u}, LastSync={LastSync:u})",
+                                        localTime, lastSync);
+                                    continue;
                                 }
                             }
 
