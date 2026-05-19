@@ -12,6 +12,7 @@ public partial class MainWindow : Window
     private DashboardPage? _dashboardPage;
     private TaskListPage? _taskListPage;
     private AddTaskPage? _addTaskPage;
+    private FilesPage? _filesPage;
     private SettingsPage? _settingsPage;
     private LogPage? _logPage;
 
@@ -59,6 +60,7 @@ public partial class MainWindow : Window
             "Dashboard" => _dashboardPage ??= new DashboardPage(),
             "Tasks" => _taskListPage ??= new TaskListPage(),
             "AddTask" => _addTaskPage ??= new AddTaskPage(),
+            "Files" => _filesPage ??= new FilesPage(),
             "Settings" => _settingsPage ??= new SettingsPage(),
             "Logs" => _logPage ??= new LogPage(),
             _ => null
@@ -69,6 +71,8 @@ public partial class MainWindow : Window
         // Refresh data when navigating to existing pages
         if (pageName == "Tasks" && _taskListPage?.DataContext is TaskListViewModel tvm)
             await tvm.RefreshAsync();
+        else if (pageName == "Files" && _filesPage?.DataContext is FilesViewModel fvm)
+            await fvm.RefreshAsync();
         else if (pageName == "Dashboard" && _dashboardPage?.DataContext is DashboardViewModel dvm)
             await dvm.RefreshAsync();
 

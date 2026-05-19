@@ -236,8 +236,7 @@ public class WebDavStorageService : ICloudStorageService
     public async Task DeleteFileAsync(CloudStorageConfig config, string remotePath)
     {
         using var client = CreateClient(config);
-        var remoteFilePath = string.IsNullOrEmpty(config.RemotePath) ? remotePath : $"{config.RemotePath.TrimStart('/')}/{remotePath}";
-        var encodedPath = EncodePath(remoteFilePath);
+        var encodedPath = EncodePath(remotePath);
         var url = NormalizeUrl(config.WebDavUrl, encodedPath);
         var response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, url));
         response.EnsureSuccessStatusCode();
@@ -248,8 +247,7 @@ public class WebDavStorageService : ICloudStorageService
         try
         {
             using var client = CreateClient(config);
-            var remoteFilePath = string.IsNullOrEmpty(config.RemotePath) ? remotePath : $"{config.RemotePath.TrimStart('/')}/{remotePath}";
-            var encodedPath = EncodePath(remoteFilePath);
+            var encodedPath = EncodePath(remotePath);
             var url = NormalizeUrl(config.WebDavUrl, encodedPath);
             var response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
             return response.IsSuccessStatusCode;

@@ -36,6 +36,7 @@
                 <StackPanel Spacing="4">
                     <Button Classes="nav-btn" Content="{DynamicResource NavDashboard}" Tag="Dashboard" Click="OnNavClick"/>
                     <Button Classes="nav-btn" Content="{DynamicResource NavTasks}" Tag="Tasks" Click="OnNavClick"/>
+                    <Button Classes="nav-btn" Content="{DynamicResource NavFiles}" Tag="Files" Click="OnNavClick"/>
                     <Button Classes="nav-btn" Content="{DynamicResource NavSettings}" Tag="Settings" Click="OnNavClick"/>
                     <Button Classes="nav-btn" Content="{DynamicResource NavLogs}" Tag="Logs" Click="OnNavClick"/>
                 </StackPanel>

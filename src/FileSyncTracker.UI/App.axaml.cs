@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using FileSyncTracker.Core.Database;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
 using FileSyncTracker.Core.Services;
@@ -75,6 +76,7 @@ public partial class App : Application
         services.AddTransient<AddTaskViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<LogViewModel>();
+        services.AddTransient<FilesViewModel>();
 
         Services = services.BuildServiceProvider();
     }
@@ -83,6 +85,17 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Ensure SQLite database is created
+            try
+            {
+                using var db = new SyncStateDbContext();
+                db.Database.EnsureCreated();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[Database] Failed to initialize: {ex.Message}");
+            }
+
             var mainWindow = new MainWindow
             {
                 DataContext = Services?.GetService<MainWindowViewModel>()
@@ -95,6 +108,7 @@ public partial class App : Application
                 try
                 {
                     await Task.Delay(1000); // Wait for UI to initialize
+
                     var repo = Services?.GetService<ITaskRepository>();
                     var tracker = Services?.GetService<IFileTrackerService>();
                     if (repo != null && tracker != null)

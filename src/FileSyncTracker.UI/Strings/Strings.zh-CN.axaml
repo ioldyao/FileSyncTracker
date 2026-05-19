@@ -8,6 +8,7 @@
     <!-- Navigation -->
     <x:String x:Key="NavDashboard">概览</x:String>
     <x:String x:Key="NavTasks">任务</x:String>
+    <x:String x:Key="NavFiles">文件</x:String>
     <x:String x:Key="NavSettings">设置</x:String>
     <x:String x:Key="NavLogs">日志</x:String>
 

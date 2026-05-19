@@ -8,6 +8,7 @@
     <!-- Navigation -->
     <x:String x:Key="NavDashboard">Dashboard</x:String>
     <x:String x:Key="NavTasks">Tasks</x:String>
+    <x:String x:Key="NavFiles">Files</x:String>
     <x:String x:Key="NavSettings">Settings</x:String>
     <x:String x:Key="NavLogs">Logs</x:String>
 
