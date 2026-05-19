@@ -82,7 +82,7 @@ public class WebDavStorageService : ICloudStorageService
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
         content.Headers.ContentLength = fileBytes.Length;
 
-        // 先尝试直接 PUT（带 Overwrite 头）
+        // 直接 PUT 覆盖（带 Overwrite 头）
         var request = new HttpRequestMessage(HttpMethod.Put, url)
         {
             Content = content
@@ -90,30 +90,6 @@ public class WebDavStorageService : ICloudStorageService
         request.Headers.Add("Overwrite", "T");
 
         var response = await client.SendAsync(request);
-
-        // 如果失败（409 Conflict），尝试 DELETE + PUT
-        if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
-        {
-            _logger.LogInformation("WebDAV PUT failed with 409 Conflict, trying DELETE + PUT: {Url}", url);
-            try
-            {
-                await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, url));
-            }
-            catch { }
-
-            // 重新创建 content（因为已经被消耗了）
-            using var retryContent = new ByteArrayContent(fileBytes);
-            retryContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
-            retryContent.Headers.ContentLength = fileBytes.Length;
-
-            var retryRequest = new HttpRequestMessage(HttpMethod.Put, url)
-            {
-                Content = retryContent
-            };
-            retryRequest.Headers.Add("Overwrite", "T");
-
-            response = await client.SendAsync(retryRequest);
-        }
 
         if (!response.IsSuccessStatusCode)
         {
