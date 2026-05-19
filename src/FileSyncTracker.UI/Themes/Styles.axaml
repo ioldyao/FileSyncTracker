@@ -1,0 +1,81 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Primary Button (Accent) -->
+    <Style Selector="Button.accent">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Button.accent /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    <Style Selector="Button.accent:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
+    </Style>
+
+    <!-- Secondary Button -->
+    <Style Selector="Button.secondary">
+        <Setter Property="Background" Value="{DynamicResource Surface3Brush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- Danger Button -->
+    <Style Selector="Button.danger">
+        <Setter Property="Background" Value="{DynamicResource ErrorBrush}"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- Success Button -->
+    <Style Selector="Button.success">
+        <Setter Property="Background" Value="{DynamicResource SuccessBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Surface1Brush}"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- Small Button -->
+    <Style Selector="Button.sm">
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+
+    <!-- Card Border -->
+    <Style Selector="Border.card">
+        <Setter Property="Background" Value="{DynamicResource Surface2Brush}"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <!-- Input TextBox -->
+    <Style Selector="TextBox.input">
+        <Setter Property="Background" Value="{DynamicResource Surface3Brush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+
+    <!-- Page Header TextBlock -->
+    <Style Selector="TextBlock.page-header">
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+
+    <!-- Section Title -->
+    <Style Selector="TextBlock.section-title">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+    </Style>
+</Styles>

@@ -9,9 +9,9 @@
         <Grid RowDefinitions="Auto,*">
             <!-- Header -->
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
-                <TextBlock Grid.Column="0" Text="{DynamicResource TaskListTitle}" FontSize="28" FontWeight="Bold" Foreground="#CDD6F4"/>
-                <Button Grid.Column="1" Content="{DynamicResource AddTask}" Background="#5B6CF8" Foreground="White"
-                        CornerRadius="8" Padding="16,8" FontWeight="SemiBold" Click="OnAddTaskClick"/>
+                <TextBlock Grid.Column="0" Text="{DynamicResource TaskListTitle}" Classes="page-header"/>
+                <Button Grid.Column="1" Content="{DynamicResource AddTask}" Classes="accent"
+                        Click="OnAddTaskClick"/>
             </Grid>
 
             <!-- Task List -->
@@ -19,7 +19,7 @@
                 <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Background="#313244" CornerRadius="8" Padding="16" Margin="0,0,0,8">
+                            <Border Classes="card" Margin="0,0,0,8">
                                 <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto">
                                     <!-- Type Icon -->
                                     <TextBlock Grid.Column="0" Grid.RowSpan="3"
@@ -28,11 +28,13 @@
 
                                     <!-- Name -->
                                     <TextBlock Grid.Column="1" Grid.Row="0"
-                                               Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                                               Text="{Binding Name}" FontSize="15" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"/>
 
                                     <!-- Path -->
                                     <TextBlock Grid.Column="1" Grid.Row="1"
-                                               Text="{Binding CurrentPath}" FontSize="12" Foreground="#6C7086"
+                                               Text="{Binding CurrentPath}" FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
                                                TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
 
                                     <!-- Status & Time -->
@@ -42,31 +44,26 @@
                                             <TextBlock Text="{Binding Status}" FontSize="11" Foreground="White"/>
                                         </Border>
                                         <TextBlock Text="{Binding LastSyncTime, StringFormat='Last sync: {0:MM/dd HH:mm}'}"
-                                                   FontSize="11" Foreground="#6C7086" VerticalAlignment="Center"/>
+                                                   FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
                                     </StackPanel>
 
                                     <!-- Actions -->
                                     <StackPanel Grid.Column="2" Grid.RowSpan="3" Orientation="Horizontal" Spacing="4"
                                                 VerticalAlignment="Center">
-                                        <Button Content="{DynamicResource SyncNow}" Background="#5B6CF8" Foreground="White"
-                                                CornerRadius="6" Padding="8,4" FontSize="12"
+                                        <Button Content="{DynamicResource SyncNow}" Classes="accent sm"
                                                 Command="{Binding $parent[ItemsControl].DataContext.SyncNowCommand}"
                                                 CommandParameter="{Binding}"/>
-                                        <Button Content="下载" Background="#A6E3A1" Foreground="#1E1E2E"
-                                                CornerRadius="6" Padding="8,4" FontSize="12"
+                                        <Button Content="下载" Classes="success sm"
                                                 Command="{Binding $parent[ItemsControl].DataContext.DownloadCommand}"
                                                 CommandParameter="{Binding}"/>
-                                        <Button Content="Edit" Background="#45475A" Foreground="#CDD6F4"
-                                                CornerRadius="6" Padding="8,4" FontSize="12"
+                                        <Button Content="Edit" Classes="secondary sm"
                                                 Command="{Binding $parent[ItemsControl].DataContext.EditTaskCommand}"
                                                 CommandParameter="{Binding}"/>
                                         <Button Content="{Binding IsEnabled, Converter={x:Static local:BoolToToggleConverter.Instance}}"
-                                                Background="#45475A" Foreground="#CDD6F4"
-                                                CornerRadius="6" Padding="8,4" FontSize="12"
+                                                Classes="secondary sm"
                                                 Command="{Binding $parent[ItemsControl].DataContext.ToggleEnabledCommand}"
                                                 CommandParameter="{Binding}"/>
-                                        <Button Content="{DynamicResource Delete}" Background="#F38BA8" Foreground="White"
-                                                CornerRadius="6" Padding="8,4" FontSize="12"
+                                        <Button Content="{DynamicResource Delete}" Classes="danger sm"
                                                 Command="{Binding $parent[ItemsControl].DataContext.DeleteTaskCommand}"
                                                 CommandParameter="{Binding}"/>
                                     </StackPanel>

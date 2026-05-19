@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="FileSyncTracker.UI.Themes.Colors">
+
+    <!-- Catppuccin Mocha Palette -->
+    <!-- Background -->
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#1E1E2E"/>
+    <SolidColorBrush x:Key="Surface0Brush" Color="#181825"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#11111B"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#313244"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#45475A"/>
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#CDD6F4"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6C7086"/>
+
+    <!-- Accent -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#5B6CF8"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#7B8CFF"/>
+
+    <!-- Semantic -->
+    <SolidColorBrush x:Key="SuccessBrush" Color="#A6E3A1"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="#F38BA8"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="#89B4FA"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#FAB387"/>
+</ResourceDictionary>

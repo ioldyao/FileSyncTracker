@@ -6,11 +6,11 @@
 
     <Border Padding="24">
         <Grid RowDefinitions="Auto,*">
-            <TextBlock Grid.Row="0" Text="{DynamicResource LogsTitle}" FontSize="28" FontWeight="Bold" Foreground="#CDD6F4" Margin="0,0,0,16"/>
+            <TextBlock Grid.Row="0" Text="{DynamicResource LogsTitle}" Classes="page-header" Margin="0,0,0,16"/>
 
-            <Border Grid.Row="1" Background="#313244" CornerRadius="8" Padding="16">
+            <Border Grid.Row="1" Classes="card">
                 <ListBox ItemsSource="{Binding LogEntries}"
-                         Background="Transparent" Foreground="#CDD6F4"
+                         Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}"
                          FontFamily="Cascadia Code,Consolas" FontSize="12"/>
             </Border>
         </Grid>

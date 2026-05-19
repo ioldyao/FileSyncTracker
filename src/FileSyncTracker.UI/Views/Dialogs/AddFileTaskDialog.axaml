@@ -4,24 +4,22 @@
         Title="{DynamicResource AddFileTask}"
         Width="480" Height="400"
         WindowStartupLocation="CenterOwner"
-        Background="#1E1E2E">
+        Background="{DynamicResource AppBackgroundBrush}">
 
     <Border Padding="24">
         <Grid RowDefinitions="Auto,*,Auto">
             <TextBlock Grid.Row="0" Text="{DynamicResource AddFileTask}" FontSize="20" FontWeight="Bold"
-                       Foreground="#CDD6F4" Margin="0,0,0,16"/>
+                       Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,0,0,16"/>
 
             <StackPanel Grid.Row="1" Spacing="12">
-                <TextBox Name="TaskNameBox" Watermark="{DynamicResource TaskName}" Background="#45475A" Foreground="#CDD6F4"/>
-                <TextBox Name="LocalPathBox" Watermark="{DynamicResource FilePath}" Background="#45475A" Foreground="#CDD6F4"/>
-                <TextBox Name="RemoteTargetBox" Watermark="{DynamicResource RemoteTarget}" Background="#45475A" Foreground="#CDD6F4"/>
+                <TextBox Name="TaskNameBox" Watermark="{DynamicResource TaskName}" Classes="input"/>
+                <TextBox Name="LocalPathBox" Watermark="{DynamicResource FilePath}" Classes="input"/>
+                <TextBox Name="RemoteTargetBox" Watermark="{DynamicResource RemoteTarget}" Classes="input"/>
             </StackPanel>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                <Button Content="{DynamicResource Cancel}" Background="#45475A" Foreground="#CDD6F4" CornerRadius="6" Padding="12,6"
-                        Click="OnCancel"/>
-                <Button Content="{DynamicResource Create}" Background="#5B6CF8" Foreground="White" CornerRadius="6" Padding="12,6"
-                        Click="OnCreate"/>
+                <Button Content="{DynamicResource Cancel}" Classes="secondary" Click="OnCancel"/>
+                <Button Content="{DynamicResource Create}" Classes="accent" Click="OnCreate"/>
             </StackPanel>
         </Grid>
     </Border>

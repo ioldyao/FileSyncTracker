@@ -1,13 +1,16 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:strings="using:FileSyncTracker.UI.Strings"
+             xmlns:themes="using:FileSyncTracker.UI.Themes"
              x:Class="FileSyncTracker.UI.App">
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://FileSyncTracker.UI/Themes/Styles.axaml"/>
     </Application.Styles>
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <themes:Colors />
                 <strings:Strings />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

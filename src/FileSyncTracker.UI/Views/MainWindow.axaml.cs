@@ -15,6 +15,7 @@ public partial class MainWindow : Window
     private SettingsPage? _settingsPage;
     private LogPage? _logPage;
 
+    private string _currentPage = "Dashboard";
     private static MainWindow? _instance;
     public static MainWindow Instance => _instance ?? throw new InvalidOperationException("MainWindow not initialized");
 
@@ -29,6 +30,26 @@ public partial class MainWindow : Window
     {
         if (sender is Button btn && btn.Tag is string tag)
             ShowPage(tag);
+    }
+
+    private void UpdateNavButtons()
+    {
+        // Find the nav StackPanel inside the first Grid row
+        if (Content is not Grid rootGrid) return;
+        if (rootGrid.Children[1] is not Grid mainGrid) return;
+        if (mainGrid.Children[0] is not Border navBorder) return;
+        if (navBorder.Child is not StackPanel navStack) return;
+
+        foreach (var child in navStack.Children)
+        {
+            if (child is Button navBtn && navBtn.Tag is string tag)
+            {
+                if (tag == _currentPage)
+                    navBtn.Classes.Add("active");
+                else
+                    navBtn.Classes.Remove("active");
+            }
+        }
     }
 
     public async void ShowPage(string pageName)
@@ -51,8 +72,11 @@ public partial class MainWindow : Window
         else if (pageName == "Dashboard" && _dashboardPage?.DataContext is DashboardViewModel dvm)
             await dvm.RefreshAsync();
 
+        _currentPage = pageName;
         ContentPanel?.Children.Clear();
         ContentPanel?.Children.Add(page);
+
+        UpdateNavButtons();
     }
 
     private void OnMinimizeClick(object? sender, RoutedEventArgs e)

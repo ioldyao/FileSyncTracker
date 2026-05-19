@@ -28,7 +28,11 @@ public partial class LogViewModel : ObservableObject
             .OrderByDescending(f => f)
             .FirstOrDefault() ?? string.Empty;
 
-        _ = LoadLogsAsync();
+        _ = Task.Run(async () =>
+        {
+            try { await LoadLogsAsync(); }
+            catch { }
+        });
         StartWatching();
     }
 
@@ -38,9 +42,20 @@ public partial class LogViewModel : ObservableObject
         if (string.IsNullOrEmpty(SelectedLogFile) || !File.Exists(SelectedLogFile))
             return;
 
-        var lines = await File.ReadAllLinesAsync(SelectedLogFile);
-        foreach (var line in lines.Skip(Math.Max(0, lines.Length - 200)))
-            LogEntries.Add(line);
+        try
+        {
+            // Read with shared read access so Serilog can still write
+            using var stream = new FileStream(SelectedLogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var reader = new StreamReader(stream);
+            var lines = await reader.ReadToEndAsync();
+            var lineArray = lines.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            foreach (var line in lineArray.Skip(Math.Max(0, lineArray.Length - 200)))
+                LogEntries.Add(line);
+        }
+        catch (IOException)
+        {
+            // File is locked by Serilog, skip
+        }
     }
 
     private void StartWatching()
@@ -50,7 +65,11 @@ public partial class LogViewModel : ObservableObject
             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size,
             EnableRaisingEvents = true
         };
-        _logWatcher.Changed += async (s, e) => await LoadLogsAsync();
+        _logWatcher.Changed += async (s, e) =>
+        {
+            try { await LoadLogsAsync(); }
+            catch { }
+        };
     }
 
     public void Dispose()

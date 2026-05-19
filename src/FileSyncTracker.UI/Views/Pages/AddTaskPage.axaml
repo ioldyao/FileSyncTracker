@@ -9,10 +9,10 @@
     <Border Padding="24">
         <Grid RowDefinitions="Auto,*,Auto">
             <!-- Header -->
-            <TextBlock Grid.Row="0" Text="{DynamicResource AddTaskTitle}" FontSize="28" FontWeight="Bold" Foreground="#CDD6F4" Margin="0,0,0,16"/>
+            <TextBlock Grid.Row="0" Text="{DynamicResource AddTaskTitle}" Classes="page-header" Margin="0,0,0,16"/>
 
             <!-- Step Content -->
-            <Border Grid.Row="1" Background="#313244" CornerRadius="8" Padding="24">
+            <Border Grid.Row="1" Classes="card">
                 <ScrollViewer>
                     <StackPanel Spacing="20">
                         <!-- Step Indicator -->
@@ -25,14 +25,14 @@
 
                         <!-- Step 1: Type Selection -->
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=1}">
-                            <TextBlock Text="{DynamicResource SelectTaskType}" FontSize="18" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                            <TextBlock Text="{DynamicResource SelectTaskType}" Classes="section-title"/>
                             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
                                 <Border Grid.Column="0" CornerRadius="8" Padding="16" Margin="0,0,8,0"
                                         Cursor="Hand" PointerPressed="OnFolderSelected"
                                         Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=Folder}">
                                     <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <TextBlock Text="📁" FontSize="32" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="{DynamicResource FolderType}" Foreground="#CDD6F4" FontSize="14" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{DynamicResource FolderType}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Grid.Column="1" CornerRadius="8" Padding="16" Margin="8,0,0,0"
@@ -40,7 +40,7 @@
                                         Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=File}">
                                     <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <TextBlock Text="📄" FontSize="32" HorizontalAlignment="Center"/>
-                                        <TextBlock Text="{DynamicResource SingleFileType}" Foreground="#CDD6F4" FontSize="14" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{DynamicResource SingleFileType}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
                             </Grid>
@@ -48,47 +48,47 @@
 
                         <!-- Step 2: Path Selection -->
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=2}">
-                            <TextBlock Text="{DynamicResource SelectPath}" FontSize="18" FontWeight="SemiBold" Foreground="#CDD6F4"/>
-                            <TextBox Text="{Binding TaskName}" Watermark="{DynamicResource TaskName}" Background="#45475A" Foreground="#CDD6F4"/>
+                            <TextBlock Text="{DynamicResource SelectPath}" Classes="section-title"/>
+                            <TextBox Text="{Binding TaskName}" Watermark="{DynamicResource TaskName}" Classes="input"/>
                             <Grid ColumnDefinitions="*,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding LocalPath}" Watermark="{DynamicResource LocalPath}" Background="#45475A" Foreground="#CDD6F4" Margin="0,0,8,0"/>
-                                <Button Grid.Column="1" Content="{DynamicResource Browse}" Background="#5B6CF8" Foreground="White" CornerRadius="6" Padding="12,6"
+                                <TextBox Grid.Column="0" Text="{Binding LocalPath}" Watermark="{DynamicResource LocalPath}" Classes="input" Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="{DynamicResource Browse}" Classes="accent"
                                         Click="OnBrowseClick"/>
                             </Grid>
                         </StackPanel>
 
                         <!-- Step 3: Storage Selection -->
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=3}">
-                            <TextBlock Text="{DynamicResource StorageConfig}" FontSize="18" FontWeight="SemiBold" Foreground="#CDD6F4"/>
-                            <TextBlock Text="{DynamicResource SelectBackupTargets}" FontSize="12" Foreground="#6C7086"/>
+                            <TextBlock Text="{DynamicResource StorageConfig}" Classes="section-title"/>
+                            <TextBlock Text="{DynamicResource SelectBackupTargets}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
 
                             <!-- Remote Path -->
-                            <TextBox Text="{Binding RemotePath}" Watermark="Remote Path (e.g., /backup)" Background="#45475A" Foreground="#CDD6F4"/>
+                            <TextBox Text="{Binding RemotePath}" Watermark="Remote Path (e.g., /backup)" Classes="input"/>
 
                             <!-- Download Path (when file not found locally, download to this path) -->
-                            <TextBox Text="{Binding DownloadPath}" Watermark="Download Path (e.g., C:\MyFiles, optional)" Background="#45475A" Foreground="#CDD6F4"/>
+                            <TextBox Text="{Binding DownloadPath}" Watermark="Download Path (e.g., C:\MyFiles, optional)" Classes="input"/>
 
                             <!-- No servers configured hint -->
-                            <Border Background="#45475A" CornerRadius="6" Padding="12" IsVisible="{Binding !HasAnyCloud}">
+                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12" IsVisible="{Binding !HasAnyCloud}">
                                 <TextBlock Text="{DynamicResource NoCloudConfigured}"
-                                           FontSize="12" Foreground="#6C7086" TextWrapping="Wrap"/>
+                                           FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                             </Border>
 
                             <!-- WebDAV Servers -->
                             <StackPanel Spacing="8" IsVisible="{Binding HasWebDav}">
-                                <TextBlock Text="☁️ WebDAV" FontSize="14" FontWeight="SemiBold" Foreground="#89B4FA"/>
+                                <TextBlock Text="☁️ WebDAV" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource InfoBrush}"/>
                                 <ItemsControl ItemsSource="{Binding AvailableWebDav}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="#45475A" CornerRadius="6" Padding="12,8" Margin="0,2"
+                                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2"
                                                     Cursor="Hand" Tag="{Binding}"
                                                     PointerPressed="OnServerCardPressed">
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0"
-                                                             Fill="#6C7086"/>
+                                                             Fill="{DynamicResource TextSecondaryBrush}"/>
                                                     <StackPanel Grid.Column="1" Spacing="2">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#CDD6F4" FontSize="13"/>
-                                                        <TextBlock Text="{Binding Url}" Foreground="#6C7086" FontSize="11"/>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
+                                                        <TextBlock Text="{Binding Url}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </Border>
@@ -99,17 +99,17 @@
 
                             <!-- OneDrive Accounts -->
                             <StackPanel Spacing="8" IsVisible="{Binding HasOneDrive}">
-                                <TextBlock Text="📁 OneDrive" FontSize="14" FontWeight="SemiBold" Foreground="#89B4FA"/>
+                                <TextBlock Text="📁 OneDrive" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource InfoBrush}"/>
                                 <ItemsControl ItemsSource="{Binding AvailableOneDrive}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="#45475A" CornerRadius="6" Padding="12,8" Margin="0,2"
+                                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2"
                                                     Cursor="Hand" Tag="{Binding}"
                                                     PointerPressed="OnServerCardPressed">
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0"
-                                                             Fill="#6C7086"/>
-                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" Foreground="#CDD6F4" FontSize="13"/>
+                                                             Fill="{DynamicResource TextSecondaryBrush}"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
                                                 </Grid>
                                             </Border>
                                         </DataTemplate>
@@ -119,19 +119,19 @@
 
                             <!-- S3 Servers -->
                             <StackPanel Spacing="8" IsVisible="{Binding HasS3}">
-                                <TextBlock Text="🗄️ S3" FontSize="14" FontWeight="SemiBold" Foreground="#89B4FA"/>
+                                <TextBlock Text="🗄️ S3" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource InfoBrush}"/>
                                 <ItemsControl ItemsSource="{Binding AvailableS3}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="#45475A" CornerRadius="6" Padding="12,8" Margin="0,2"
+                                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2"
                                                     Cursor="Hand" Tag="{Binding}"
                                                     PointerPressed="OnServerCardPressed">
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0"
-                                                             Fill="#6C7086"/>
+                                                             Fill="{DynamicResource TextSecondaryBrush}"/>
                                                     <StackPanel Grid.Column="1" Spacing="2">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#CDD6F4" FontSize="13"/>
-                                                        <TextBlock Text="{Binding Bucket}" Foreground="#6C7086" FontSize="11"/>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
+                                                        <TextBlock Text="{Binding Bucket}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
                                                     </StackPanel>
                                                 </Grid>
                                             </Border>
@@ -141,24 +141,27 @@
                             </StackPanel>
 
                             <!-- Selected targets summary -->
-                            <Border Background="#5B6CF820" CornerRadius="6" Padding="12" BorderBrush="#5B6CF8" BorderThickness="1">
+                            <Border CornerRadius="6" Padding="12">
+                                <Border.Background>
+                                    <SolidColorBrush Color="#5B6CF8" Opacity="0.12"/>
+                                </Border.Background>
                                 <StackPanel Spacing="4">
-                                    <TextBlock Text="{DynamicResource SelectedTargets}" FontSize="12" FontWeight="SemiBold" Foreground="#CDD6F4"/>
-                                    <TextBlock Text="{Binding SelectedTargets.Count}" FontSize="12" Foreground="#89B4FA"/>
+                                    <TextBlock Text="{DynamicResource SelectedTargets}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding SelectedTargets.Count}" FontSize="12" Foreground="{DynamicResource InfoBrush}"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
 
                         <!-- Step 4: Schedule -->
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=4}">
-                            <TextBlock Text="{DynamicResource SyncMode}" FontSize="18" FontWeight="SemiBold" Foreground="#CDD6F4"/>
+                            <TextBlock Text="{DynamicResource SyncMode}" Classes="section-title"/>
                             <RadioButton Content="{DynamicResource RealTime}" GroupName="SyncMode"
-                                         Foreground="#CDD6F4" FontSize="14"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14"
                                          IsChecked="{Binding IsRealTimeMode}"/>
                             <RadioButton Content="{DynamicResource Scheduled}" GroupName="SyncMode"
-                                         Foreground="#CDD6F4" FontSize="14"
+                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14"
                                          IsChecked="{Binding IsScheduledMode}"/>
-                            <TextBox Text="{Binding CronExpression}" Watermark="{DynamicResource CronExpression}" Background="#45475A" Foreground="#CDD6F4"/>
+                            <TextBox Text="{Binding CronExpression}" Watermark="{DynamicResource CronExpression}" Classes="input"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -166,16 +169,15 @@
 
             <!-- Navigation Buttons -->
             <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,16,0,0">
-                <Button Grid.Column="0" Content="{DynamicResource Back}" Background="#45475A" Foreground="#CDD6F4"
-                        CornerRadius="8" Padding="16,8" IsVisible="{Binding CurrentStep, Converter={x:Static local:GreaterThanOneConverter.Instance}}"
+                <Button Grid.Column="0" Content="{DynamicResource Back}" Classes="secondary"
+                        IsVisible="{Binding CurrentStep, Converter={x:Static local:GreaterThanOneConverter.Instance}}"
                         Click="OnPrevStepClick"/>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                    <Button Content="{DynamicResource Next}" Background="#5B6CF8" Foreground="White"
-                            CornerRadius="8" Padding="16,8"
+                    <Button Content="{DynamicResource Next}" Classes="accent"
                             IsVisible="{Binding CurrentStep, Converter={x:Static local:LessThanFourConverter.Instance}}"
                             Click="OnNextStepClick"/>
-                    <Button Content="{DynamicResource Create}" Background="#A6E3A1" Foreground="#1E1E2E"
-                            CornerRadius="8" Padding="16,8" FontWeight="SemiBold"
+                    <Button Content="{DynamicResource Create}" Classes="success"
+                            FontWeight="SemiBold"
                             IsVisible="{Binding CurrentStep, Converter={x:Static local:EqualToFourConverter.Instance}}"
                             Click="OnCreateClick"/>
                 </StackPanel>

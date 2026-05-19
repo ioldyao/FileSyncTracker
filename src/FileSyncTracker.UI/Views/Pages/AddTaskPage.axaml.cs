@@ -5,7 +5,9 @@ using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.UI.ViewModels;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace FileSyncTracker.UI.Views.Pages;
 
@@ -26,7 +28,11 @@ public partial class AddTaskPage : UserControl
             {
                 Dispatcher.UIThread.Post(() => System.Diagnostics.Debug.WriteLine($"CreateTask error: {msg}"));
             };
-            _ = vm.LoadAvailableServersAsync();
+            _ = Task.Run(async () =>
+            {
+                try { await vm.LoadAvailableServersAsync(); }
+                catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"LoadAvailableServers failed: {ex.Message}"); }
+            });
 
             // Load editing task data
             if (AddTaskViewModel.EditingTask is SyncTask editTask)
