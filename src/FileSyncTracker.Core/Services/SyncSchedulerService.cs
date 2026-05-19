@@ -104,6 +104,23 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
 
                             var service = GetCloudService(target.Type);
                             var remoteDir = target.RemotePath.TrimStart('/');
+
+                            // Check if remote file is newer than local before uploading
+                            if (task.Type == SyncTaskType.SingleFile && File.Exists(task.CurrentPath))
+                            {
+                                var localTime = File.GetLastWriteTimeUtc(task.CurrentPath);
+                                var fileName = Path.GetFileName(task.CurrentPath);
+                                var remoteInfo = await service.GetFileInfoAsync(config, fileName);
+                                _logger.LogInformation("Timestamp check: Local={LocalTime:u}, Remote={RemoteTime}, File={File}",
+                                    localTime, remoteInfo?.LastModified.ToString("u") ?? "not found", fileName);
+                                if (remoteInfo != null && remoteInfo.LastModified.ToUniversalTime() > localTime)
+                                {
+                                    _logger.LogWarning("Skipping upload: remote is newer (Remote={RemoteTime:u} > Local={LocalTime:u})",
+                                        remoteInfo.LastModified.ToUniversalTime(), localTime);
+                                    continue;
+                                }
+                            }
+
                             if (task.Type == SyncTaskType.Folder)
                                 await service.UploadFolderAsync(config, task.CurrentPath, remoteDir);
                             else
@@ -154,32 +171,24 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
     private async Task<AppSettings?> ReadSettingsAsync()
     {
         var settingsPath = AppSettings.GetSettingsPath();
-        _logger.LogInformation("ReadSettingsAsync: Path={Path}, Exists={Exists}", settingsPath, File.Exists(settingsPath));
-
         if (!File.Exists(settingsPath)) return null;
 
         var raw = await File.ReadAllTextAsync(settingsPath);
-        _logger.LogInformation("ReadSettingsAsync: Raw length={Length}, starts with={Start}", raw.Length, raw.TrimStart().Substring(0, Math.Min(20, raw.TrimStart().Length)));
-
         var json = raw.TrimStart();
         if (!json.StartsWith('{'))
         {
-            _logger.LogInformation("ReadSettingsAsync: File is encrypted, attempting decryption");
             try
             {
                 var decrypted = Security.SecureStorage.Decrypt(raw);
-                _logger.LogInformation("ReadSettingsAsync: Decrypted, starts with={Start}", decrypted.Substring(0, Math.Min(20, decrypted.Length)));
                 if (decrypted.StartsWith('{')) json = decrypted;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "ReadSettingsAsync: Decryption failed");
+                _logger.LogError(ex, "Settings decryption failed");
             }
         }
 
-        var result = JsonSerializer.Deserialize<AppSettings>(json);
-        _logger.LogInformation("ReadSettingsAsync: Deserialized={Success}, WebDavCount={Count}", result != null, result?.WebDavServers?.Count ?? 0);
-        return result;
+        return JsonSerializer.Deserialize<AppSettings>(json);
     }
 
     private static CloudStorageConfig? ResolveConfig(AppSettings settings, StorageTarget target)
