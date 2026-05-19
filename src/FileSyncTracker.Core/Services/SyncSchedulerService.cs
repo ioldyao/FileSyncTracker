@@ -111,13 +111,23 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
                                 var localTime = File.GetLastWriteTimeUtc(task.CurrentPath);
                                 var fileName = Path.GetFileName(task.CurrentPath);
                                 var remoteInfo = await service.GetFileInfoAsync(config, fileName);
-                                _logger.LogInformation("Timestamp check: Local={LocalTime:u}, Remote={RemoteTime}, File={File}",
-                                    localTime, remoteInfo?.LastModified.ToString("u") ?? "not found", fileName);
-                                if (remoteInfo != null && remoteInfo.LastModified.ToUniversalTime() > localTime)
+                                if (remoteInfo != null)
                                 {
-                                    _logger.LogWarning("Skipping upload: remote is newer (Remote={RemoteTime:u} > Local={LocalTime:u})",
-                                        remoteInfo.LastModified.ToUniversalTime(), localTime);
-                                    continue;
+                                    var remoteUtc = remoteInfo.LastModified.Kind == DateTimeKind.Utc
+                                        ? remoteInfo.LastModified
+                                        : remoteInfo.LastModified.ToUniversalTime();
+                                    _logger.LogInformation("Timestamp check: Local(Utc)={LocalTime:u}, Remote(Raw)={RemoteRaw}, Remote(Utc)={RemoteUtc:u}, File={File}",
+                                        localTime, remoteInfo.LastModified, remoteUtc, fileName);
+                                    if (remoteUtc > localTime)
+                                    {
+                                        _logger.LogWarning("Skipping upload: remote is newer (Remote={RemoteUtc:u} > Local={LocalTime:u})",
+                                            remoteUtc, localTime);
+                                        continue;
+                                    }
+                                }
+                                else
+                                {
+                                    _logger.LogInformation("Timestamp check: Remote file not found for {File}, proceeding with upload", fileName);
                                 }
                             }
 
