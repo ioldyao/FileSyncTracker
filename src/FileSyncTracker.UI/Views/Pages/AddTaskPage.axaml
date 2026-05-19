@@ -65,6 +65,9 @@
                             <!-- Remote Path -->
                             <TextBox Text="{Binding RemotePath}" Watermark="Remote Path (e.g., /backup)" Background="#45475A" Foreground="#CDD6F4"/>
 
+                            <!-- Download Path (when file not found locally, download to this path) -->
+                            <TextBox Text="{Binding DownloadPath}" Watermark="Download Path (e.g., C:\MyFiles, optional)" Background="#45475A" Foreground="#CDD6F4"/>
+
                             <!-- No servers configured hint -->
                             <Border Background="#45475A" CornerRadius="6" Padding="12" IsVisible="{Binding !HasAnyCloud}">
                                 <TextBlock Text="{DynamicResource NoCloudConfigured}"

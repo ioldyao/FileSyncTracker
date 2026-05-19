@@ -37,6 +37,7 @@ public partial class AddTaskPage : UserControl
                 vm.SelectedMode = editTask.Mode;
                 vm.CronExpression = editTask.CronExpression ?? string.Empty;
                 vm.RemotePath = editTask.RemotePath;
+                vm.DownloadPath = editTask.DownloadPath ?? string.Empty;
                 if (editTask.StorageTargets != null)
                     foreach (var t in editTask.StorageTargets)
                         vm.SelectedTargets.Add(t);

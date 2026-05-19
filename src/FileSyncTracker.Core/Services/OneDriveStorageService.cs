@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using FileSyncTracker.Core.Models;
 using Microsoft.Extensions.Logging;
+using RemoteFileInfo = FileSyncTracker.Core.Models.RemoteFileInfo;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -211,6 +212,34 @@ public class OneDriveStorageService : ICloudStorageService
         catch
         {
             return false;
+        }
+    }
+
+    public async Task<RemoteFileInfo?> GetFileInfoAsync(CloudStorageConfig config, string remotePath)
+    {
+        try
+        {
+            using var client = CreateClient(config);
+            var itemPath = GetItemPath(config, remotePath);
+            var url = $"{GraphBaseUrl}/me/drive/root:/{itemPath}";
+
+            var response = await client.GetAsync(url);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+            return new RemoteFileInfo
+            {
+                FileName = json.TryGetProperty("name", out var name) ? name.GetString() ?? "" : "",
+                FileSize = json.TryGetProperty("size", out var size) ? size.GetInt64() : 0,
+                LastModified = json.TryGetProperty("lastModifiedDateTime", out var modified)
+                    ? DateTime.Parse(modified.GetString() ?? "")
+                    : DateTime.MinValue
+            };
+        }
+        catch
+        {
+            return null;
         }
     }
 }

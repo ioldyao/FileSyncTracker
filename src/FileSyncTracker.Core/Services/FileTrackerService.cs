@@ -1,7 +1,9 @@
 using FileSyncTracker.Core.Events;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
+using FileSyncTracker.Core.Security;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -12,6 +14,7 @@ public class FileTrackerService : IFileTrackerService, IDisposable
     private readonly IFileWatcherService _fileWatcherService;
     private readonly ITaskRepository _taskRepository;
     private readonly ISyncSchedulerService _syncSchedulerService;
+    private readonly WebDavStorageService _webDavService;
     private readonly Dictionary<Guid, CancellationTokenSource> _trackingTokens = new();
     private readonly Dictionary<Guid, DateTime> _lastSyncTimes = new();
     private readonly HashSet<Guid> _syncingTasks = new();
@@ -25,13 +28,15 @@ public class FileTrackerService : IFileTrackerService, IDisposable
         IEverythingService everythingService,
         IFileWatcherService fileWatcherService,
         ITaskRepository taskRepository,
-        ISyncSchedulerService syncSchedulerService)
+        ISyncSchedulerService syncSchedulerService,
+        WebDavStorageService webDavService)
     {
         _logger = logger;
         _everythingService = everythingService;
         _fileWatcherService = fileWatcherService;
         _taskRepository = taskRepository;
         _syncSchedulerService = syncSchedulerService;
+        _webDavService = webDavService;
     }
 
     public async Task StartTrackingAsync(SyncTask task)
@@ -52,7 +57,21 @@ public class FileTrackerService : IFileTrackerService, IDisposable
             }
             else
             {
-                _logger.LogWarning("File not found for task {TaskId}, still watching old path", task.Id);
+                _logger.LogWarning("File not found by Everything for task {TaskId}", task.Id);
+
+                // 如果配置了下载路径，尝试从云端下载
+                if (!string.IsNullOrEmpty(task.DownloadPath))
+                {
+                    _logger.LogInformation("Trying to download from cloud to {DownloadPath}", task.DownloadPath);
+                    if (await TryDownloadFromCloudAsync(task))
+                    {
+                        _logger.LogInformation("Downloaded file to {Path}", task.DownloadPath);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to download file for task {TaskId}", task.Id);
+                    }
+                }
             }
         }
 
@@ -257,8 +276,30 @@ public class FileTrackerService : IFileTrackerService, IDisposable
         else
         {
             _logger.LogWarning("File not found by Everything for task {TaskId}", task.Id);
+
+            // 如果配置了下载路径，尝试从云端下载
+            if (!string.IsNullOrEmpty(task.DownloadPath))
+            {
+                _logger.LogInformation("Trying to download from cloud to {DownloadPath}", task.DownloadPath);
+                if (await TryDownloadFromCloudAsync(task))
+                {
+                    task.Status = SyncStatus.Idle;
+                    task.PathIsValid = true;
+                    StatusChanged?.Invoke(this, new SyncStatusChangedEvent
+                    {
+                        TaskId = task.Id,
+                        NewStatus = SyncStatus.Idle
+                    });
+
+                    // 重新绑定监控
+                    _fileWatcherService.Watch(task.CurrentPath, args => OnFileChanged(task, args));
+                    await _taskRepository.UpdateAsync(task);
+                    return;
+                }
+            }
+
             task.Status = SyncStatus.Error;
-            task.LastError = "文件未找到，请确认 Everything 已启动";
+            task.LastError = "文件未找到，请确认 Everything 已启动或设置下载路径";
             StatusChanged?.Invoke(this, new SyncStatusChangedEvent
             {
                 TaskId = task.Id,
@@ -267,6 +308,92 @@ public class FileTrackerService : IFileTrackerService, IDisposable
             });
             await _taskRepository.UpdateAsync(task);
         }
+    }
+
+    private async Task<bool> TryDownloadFromCloudAsync(SyncTask task)
+    {
+        if (task.StorageTargets == null || task.StorageTargets.Count == 0)
+            return false;
+
+        try
+        {
+            var settings = await ReadSettingsAsync();
+            if (settings == null) return false;
+
+            // Ensure download directory exists
+            var downloadDir = Path.GetDirectoryName(task.DownloadPath);
+            if (!string.IsNullOrEmpty(downloadDir) && !Directory.Exists(downloadDir))
+                Directory.CreateDirectory(downloadDir);
+
+            foreach (var target in task.StorageTargets)
+            {
+                try
+                {
+                    var config = ResolveConfig(settings, target);
+                    if (config == null) continue;
+
+                    var fileName = Path.GetFileName(task.CurrentPath);
+                    var remoteFilePath = string.IsNullOrEmpty(target.RemotePath)
+                        ? fileName
+                        : $"{target.RemotePath.TrimStart('/')}/{fileName}";
+
+                    await _webDavService.DownloadFileAsync(config, remoteFilePath, task.DownloadPath);
+
+                    // Update task path to download path
+                    task.CurrentPath = task.DownloadPath;
+                    task.PathIsValid = true;
+                    await _taskRepository.UpdateAsync(task);
+
+                    _logger.LogInformation("Downloaded file from cloud: {Path}", task.DownloadPath);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to download from target {Target}", target.ServerName);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to download from cloud");
+        }
+
+        return false;
+    }
+
+    private async Task<AppSettings?> ReadSettingsAsync()
+    {
+        var settingsPath = AppSettings.GetSettingsPath();
+        if (!File.Exists(settingsPath)) return null;
+
+        var raw = await File.ReadAllTextAsync(settingsPath);
+        var json = raw.TrimStart();
+        if (!json.StartsWith('{'))
+        {
+            var decrypted = SecureStorage.Decrypt(raw);
+            if (decrypted.StartsWith('{'))
+                json = decrypted;
+        }
+
+        return JsonSerializer.Deserialize<AppSettings>(json);
+    }
+
+    private static CloudStorageConfig? ResolveConfig(AppSettings settings, StorageTarget target)
+    {
+        return target.Type switch
+        {
+            StorageType.WebDAV => settings.WebDavServers
+                .Where(s => s.Id == target.ServerId)
+                .Select(s => new CloudStorageConfig
+                {
+                    StorageType = StorageType.WebDAV,
+                    WebDavUrl = s.Url,
+                    WebDavUsername = s.Username,
+                    WebDavPassword = s.Password,
+                    RemotePath = target.RemotePath
+                }).FirstOrDefault(),
+            _ => null
+        };
     }
 
     public void Dispose()

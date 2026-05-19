@@ -37,6 +37,7 @@ public partial class AddTaskViewModel : ObservableObject
     [ObservableProperty] private string _cronExpression = string.Empty;
     [ObservableProperty] private SyncDirection _selectedDirection = SyncDirection.Push;
     [ObservableProperty] private string _remotePath = "/";
+    [ObservableProperty] private string _downloadPath = string.Empty;
 
     // Selected storage targets (multi-select)
     public ObservableCollection<StorageTarget> SelectedTargets { get; } = new();
@@ -170,6 +171,7 @@ public partial class AddTaskViewModel : ObservableObject
                 task.CronExpression = SelectedMode == SyncMode.Scheduled ? CronExpression : null;
                 task.Direction = SelectedDirection;
                 task.RemotePath = RemotePath;
+                task.DownloadPath = string.IsNullOrWhiteSpace(DownloadPath) ? null : DownloadPath;
                 task.StorageTargets = new List<StorageTarget>(SelectedTargets);
                 foreach (var target in task.StorageTargets)
                     target.RemotePath = RemotePath;
@@ -192,6 +194,7 @@ public partial class AddTaskViewModel : ObservableObject
                     CronExpression = SelectedMode == SyncMode.Scheduled ? CronExpression : null,
                     Direction = SelectedDirection,
                     RemotePath = RemotePath,
+                    DownloadPath = string.IsNullOrWhiteSpace(DownloadPath) ? null : DownloadPath,
                     StorageTargets = new List<StorageTarget>(SelectedTargets),
                     PathIsValid = File.Exists(LocalPath) || Directory.Exists(LocalPath)
                 };

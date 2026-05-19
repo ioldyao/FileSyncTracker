@@ -24,6 +24,9 @@ public class SyncTask
     public List<StorageTarget> StorageTargets { get; set; } = new();
     public string RemotePath { get; set; } = "/";
 
+    // Download path (when file doesn't exist locally, download to this path)
+    public string? DownloadPath { get; set; }
+
     // Status
     public SyncStatus Status { get; set; } = SyncStatus.Idle;
     public DateTime? LastSyncTime { get; set; }

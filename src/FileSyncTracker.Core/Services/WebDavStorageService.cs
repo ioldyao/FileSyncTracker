@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using FileSyncTracker.Core.Models;
 using Microsoft.Extensions.Logging;
+using RemoteFileInfo = FileSyncTracker.Core.Models.RemoteFileInfo;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -77,22 +78,11 @@ public class WebDavStorageService : ICloudStorageService
             await EnsureDirectoryExists(client, dirUrl);
         }
 
-        // Try DELETE first if file exists (some WebDAV servers need this for overwrite)
-        try
-        {
-            var headResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, url));
-            if (headResponse.IsSuccessStatusCode)
-            {
-                _logger.LogInformation("WebDAV File exists, deleting before upload: {Url}", url);
-                await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, url));
-            }
-        }
-        catch { }
-
         using var content = new ByteArrayContent(fileBytes);
         content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
         content.Headers.ContentLength = fileBytes.Length;
 
+        // 先尝试直接 PUT（带 Overwrite 头）
         var request = new HttpRequestMessage(HttpMethod.Put, url)
         {
             Content = content
@@ -100,6 +90,30 @@ public class WebDavStorageService : ICloudStorageService
         request.Headers.Add("Overwrite", "T");
 
         var response = await client.SendAsync(request);
+
+        // 如果失败（409 Conflict），尝试 DELETE + PUT
+        if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            _logger.LogInformation("WebDAV PUT failed with 409 Conflict, trying DELETE + PUT: {Url}", url);
+            try
+            {
+                await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, url));
+            }
+            catch { }
+
+            // 重新创建 content（因为已经被消耗了）
+            using var retryContent = new ByteArrayContent(fileBytes);
+            retryContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+            retryContent.Headers.ContentLength = fileBytes.Length;
+
+            var retryRequest = new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = retryContent
+            };
+            retryRequest.Headers.Add("Overwrite", "T");
+
+            response = await client.SendAsync(retryRequest);
+        }
 
         if (!response.IsSuccessStatusCode)
         {
@@ -267,6 +281,71 @@ public class WebDavStorageService : ICloudStorageService
         catch
         {
             return false;
+        }
+    }
+
+    /// <summary>
+    /// 获取远端文件信息（大小、修改时间）
+    /// </summary>
+    public async Task<RemoteFileInfo?> GetFileInfoAsync(CloudStorageConfig config, string remotePath)
+    {
+        try
+        {
+            using var client = CreateClient(config);
+            var remoteFilePath = string.IsNullOrEmpty(config.RemotePath) ? remotePath : $"{config.RemotePath.TrimStart('/')}/{remotePath}";
+            var encodedPath = EncodePath(remoteFilePath);
+            var url = NormalizeUrl(config.WebDavUrl, encodedPath);
+
+            var request = new HttpRequestMessage(new HttpMethod("PROPFIND"), url);
+            request.Headers.Add("Depth", "0");
+            request.Content = new StringContent(
+                "<?xml version=\"1.0\"?><d:propfind xmlns:d=\"DAV:\"><d:prop><d:getcontentlength/><d:getlastmodified/></d:prop></d:propfind>",
+                Encoding.UTF8, "application/xml");
+
+            var response = await client.SendAsync(request);
+            if (!response.IsSuccessStatusCode) return null;
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            // 解析文件大小
+            long fileSize = 0;
+            var sizeTag = "<d:getcontentlength>";
+            var sizeEndTag = "</d:getcontentlength>";
+            var sizeIdx = body.IndexOf(sizeTag);
+            if (sizeIdx != -1)
+            {
+                sizeIdx += sizeTag.Length;
+                var sizeEndIdx = body.IndexOf(sizeEndTag, sizeIdx);
+                if (sizeEndIdx != -1)
+                    long.TryParse(body.Substring(sizeIdx, sizeEndIdx - sizeIdx), out fileSize);
+            }
+
+            // 解析修改时间
+            DateTime lastModified = DateTime.MinValue;
+            var timeTag = "<d:getlastmodified>";
+            var timeEndTag = "</d:getlastmodified>";
+            var timeIdx = body.IndexOf(timeTag);
+            if (timeIdx != -1)
+            {
+                timeIdx += timeTag.Length;
+                var timeEndIdx = body.IndexOf(timeEndTag, timeIdx);
+                if (timeEndIdx != -1)
+                {
+                    var timeStr = body.Substring(timeIdx, timeEndIdx - timeIdx);
+                    DateTime.TryParse(timeStr, out lastModified);
+                }
+            }
+
+            return new RemoteFileInfo
+            {
+                FileName = Path.GetFileName(remotePath),
+                FileSize = fileSize,
+                LastModified = lastModified
+            };
+        }
+        catch
+        {
+            return null;
         }
     }
 

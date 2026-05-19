@@ -1,4 +1,5 @@
 using FileSyncTracker.Core.Models;
+using RemoteFileInfo = FileSyncTracker.Core.Models.RemoteFileInfo;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -19,4 +20,5 @@ public interface ICloudStorageService
     Task<List<string>> ListFilesAsync(CloudStorageConfig config, string remotePath);
     Task DeleteFileAsync(CloudStorageConfig config, string remotePath);
     Task<bool> FileExistsAsync(CloudStorageConfig config, string remotePath);
+    Task<RemoteFileInfo?> GetFileInfoAsync(CloudStorageConfig config, string remotePath);
 }

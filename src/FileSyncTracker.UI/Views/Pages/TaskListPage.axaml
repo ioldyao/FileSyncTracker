@@ -52,6 +52,10 @@
                                                 CornerRadius="6" Padding="8,4" FontSize="12"
                                                 Command="{Binding $parent[ItemsControl].DataContext.SyncNowCommand}"
                                                 CommandParameter="{Binding}"/>
+                                        <Button Content="下载" Background="#A6E3A1" Foreground="#1E1E2E"
+                                                CornerRadius="6" Padding="8,4" FontSize="12"
+                                                Command="{Binding $parent[ItemsControl].DataContext.DownloadCommand}"
+                                                CommandParameter="{Binding}"/>
                                         <Button Content="Edit" Background="#45475A" Foreground="#CDD6F4"
                                                 CornerRadius="6" Padding="8,4" FontSize="12"
                                                 Command="{Binding $parent[ItemsControl].DataContext.EditTaskCommand}"

@@ -3,6 +3,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using FileSyncTracker.Core.Models;
 using Microsoft.Extensions.Logging;
+using RemoteFileInfo = FileSyncTracker.Core.Models.RemoteFileInfo;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -187,6 +188,27 @@ public class S3StorageService : ICloudStorageService
         catch
         {
             return false;
+        }
+    }
+
+    public async Task<RemoteFileInfo?> GetFileInfoAsync(CloudStorageConfig config, string remotePath)
+    {
+        try
+        {
+            using var client = CreateClient(config);
+            var key = GetRemoteKey(config, remotePath);
+            var response = await client.GetObjectMetadataAsync(config.S3Bucket, key);
+
+            return new RemoteFileInfo
+            {
+                FileName = Path.GetFileName(remotePath),
+                FileSize = response.ContentLength,
+                LastModified = response.LastModified
+            };
+        }
+        catch
+        {
+            return null;
         }
     }
 }

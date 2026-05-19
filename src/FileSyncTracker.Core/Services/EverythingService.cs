@@ -185,7 +185,7 @@ public class EverythingService : IEverythingService
 
                     var candidate = FileIdentity.FromFile(fullPath);
 
-                    // 优先级 1：NTFS FileId 匹配
+                    // 优先级 1：NTFS FileId 匹配（同卷移动）
                     if (identity.NtfsFileId != 0 && candidate.NtfsFileId != 0
                         && identity.NtfsFileId == candidate.NtfsFileId)
                     {
@@ -193,19 +193,14 @@ public class EverythingService : IEverythingService
                         return fullPath;
                     }
 
-                    // 优先级 2：完整身份匹配
+                    // 优先级 2：完整身份匹配（文件名+大小+修改时间）
                     if (identity.Matches(candidate))
                     {
                         _logger.LogInformation("File matched by full identity: {Path}", fullPath);
                         return fullPath;
                     }
 
-                    // 优先级 3：文件名 + 大小匹配
-                    if (identity.FallbackMatch(candidate))
-                    {
-                        _logger.LogInformation("File matched by fallback (name+size): {Path}", fullPath);
-                        return fullPath;
-                    }
+                    // 不使用回退匹配 - 文件名+大小太宽松，会错误匹配云端同步的文件
                 }
 
                 _logger.LogWarning("Everything found {Count} results but no match for FileId={FileId}", count, identity.NtfsFileId);
