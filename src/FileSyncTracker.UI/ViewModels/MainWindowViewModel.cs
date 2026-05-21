@@ -30,10 +30,9 @@ public partial class MainWindowViewModel : ObservableObject
         _taskRepository = taskRepository;
         _everythingService = everythingService;
         _syncthingService = syncthingService;
-        _ = InitializeAsync();
     }
 
-    private async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         EverythingStatus = _everythingService.IsAvailable ? "Connected" : "Disconnected";
         SyncthingStatus = await _syncthingService.IsRunningAsync() ? "Running" : "Stopped";

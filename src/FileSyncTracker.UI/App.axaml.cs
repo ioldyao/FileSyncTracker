@@ -64,7 +64,7 @@ public partial class App : Application
         services.AddSingleton<IFileTrackerService, FileTrackerService>();
         services.AddSingleton<ISyncthingService, SyncthingService>();
         services.AddSingleton<ISyncSchedulerService, SyncSchedulerService>();
-        services.AddSingleton<ICloudStorageService, WebDavStorageService>();
+        services.AddSingleton<IConfigurationService, ConfigurationService>();
         services.AddSingleton<WebDavStorageService>();
         services.AddSingleton<OneDriveStorageService>();
         services.AddSingleton<S3StorageService>();
@@ -96,11 +96,16 @@ public partial class App : Application
                 Debug.WriteLine($"[Database] Failed to initialize: {ex.Message}");
             }
 
+            var mainVm = Services?.GetService<MainWindowViewModel>();
             var mainWindow = new MainWindow
             {
-                DataContext = Services?.GetService<MainWindowViewModel>()
+                DataContext = mainVm
             };
             desktop.MainWindow = mainWindow;
+
+            // Initialize MainWindowViewModel
+            if (mainVm != null)
+                _ = mainVm.InitializeAsync();
 
             // Re-start file tracking for existing SingleFile tasks
             _ = Task.Run(async () =>

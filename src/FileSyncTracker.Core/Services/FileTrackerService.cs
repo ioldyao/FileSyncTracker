@@ -1,9 +1,7 @@
 using FileSyncTracker.Core.Events;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
-using FileSyncTracker.Core.Security;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -14,7 +12,7 @@ public class FileTrackerService : IFileTrackerService, IDisposable
     private readonly IFileWatcherService _fileWatcherService;
     private readonly ITaskRepository _taskRepository;
     private readonly ISyncSchedulerService _syncSchedulerService;
-    private readonly WebDavStorageService _webDavService;
+    private readonly IConfigurationService _configService;
     private readonly Dictionary<Guid, CancellationTokenSource> _trackingTokens = new();
     private readonly Dictionary<Guid, DateTime> _lastSyncTimes = new();
     private readonly HashSet<Guid> _syncingTasks = new();
@@ -29,14 +27,14 @@ public class FileTrackerService : IFileTrackerService, IDisposable
         IFileWatcherService fileWatcherService,
         ITaskRepository taskRepository,
         ISyncSchedulerService syncSchedulerService,
-        WebDavStorageService webDavService)
+        IConfigurationService configService)
     {
         _logger = logger;
         _everythingService = everythingService;
         _fileWatcherService = fileWatcherService;
         _taskRepository = taskRepository;
         _syncSchedulerService = syncSchedulerService;
-        _webDavService = webDavService;
+        _configService = configService;
     }
 
     public async Task StartTrackingAsync(SyncTask task)
@@ -317,7 +315,7 @@ public class FileTrackerService : IFileTrackerService, IDisposable
 
         try
         {
-            var settings = await ReadSettingsAsync();
+            var settings = await _configService.GetSettingsAsync();
             if (settings == null) return false;
 
             // Ensure download directory exists
@@ -329,15 +327,16 @@ public class FileTrackerService : IFileTrackerService, IDisposable
             {
                 try
                 {
-                    var config = ResolveConfig(settings, target);
+                    var config = _configService.ResolveConfig(settings, target);
                     if (config == null) continue;
 
+                    var service = _configService.GetCloudService(target.Type);
                     var fileName = Path.GetFileName(task.CurrentPath);
                     var remoteFilePath = string.IsNullOrEmpty(target.RemotePath)
                         ? fileName
                         : $"{target.RemotePath.TrimStart('/')}/{fileName}";
 
-                    await _webDavService.DownloadFileAsync(config, remoteFilePath, task.DownloadPath);
+                    await service.DownloadFileAsync(config, remoteFilePath, task.DownloadPath);
 
                     // Update task path to download path
                     task.CurrentPath = task.DownloadPath;
@@ -359,41 +358,6 @@ public class FileTrackerService : IFileTrackerService, IDisposable
         }
 
         return false;
-    }
-
-    private async Task<AppSettings?> ReadSettingsAsync()
-    {
-        var settingsPath = AppSettings.GetSettingsPath();
-        if (!File.Exists(settingsPath)) return null;
-
-        var raw = await File.ReadAllTextAsync(settingsPath);
-        var json = raw.TrimStart();
-        if (!json.StartsWith('{'))
-        {
-            var decrypted = SecureStorage.Decrypt(raw);
-            if (decrypted.StartsWith('{'))
-                json = decrypted;
-        }
-
-        return JsonSerializer.Deserialize<AppSettings>(json);
-    }
-
-    private static CloudStorageConfig? ResolveConfig(AppSettings settings, StorageTarget target)
-    {
-        return target.Type switch
-        {
-            StorageType.WebDAV => settings.WebDavServers
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.WebDAV,
-                    WebDavUrl = s.Url,
-                    WebDavUsername = s.Username,
-                    WebDavPassword = s.Password,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-            _ => null
-        };
     }
 
     public void Dispose()

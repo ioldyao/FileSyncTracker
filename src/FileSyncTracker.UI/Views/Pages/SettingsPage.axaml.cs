@@ -17,6 +17,14 @@ public partial class SettingsPage : UserControl
         InitializeComponent();
         _vm = App.Services?.GetService(typeof(SettingsViewModel)) as SettingsViewModel;
         DataContext = _vm;
+        Loaded += OnLoaded;
+    }
+
+    private async void OnLoaded(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        Loaded -= OnLoaded;
+        if (_vm != null)
+            await _vm.InitializeAsync();
     }
 
     private async void OnSaveClick(object? sender, RoutedEventArgs e)

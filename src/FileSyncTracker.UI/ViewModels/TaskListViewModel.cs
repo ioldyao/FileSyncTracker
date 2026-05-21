@@ -4,11 +4,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
-using FileSyncTracker.Core.Security;
 using FileSyncTracker.Core.Services;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FileSyncTracker.UI.ViewModels;
@@ -19,7 +17,7 @@ public partial class TaskListViewModel : ObservableObject
     private readonly ISyncthingService _syncthingService;
     private readonly IFileTrackerService _fileTrackerService;
     private readonly ISyncSchedulerService _syncSchedulerService;
-    private readonly WebDavStorageService _webDavService;
+    private readonly IConfigurationService _configService;
     private readonly ILogger<TaskListViewModel> _logger;
 
     public ObservableCollection<SyncTask> Tasks { get; } = new();
@@ -29,14 +27,14 @@ public partial class TaskListViewModel : ObservableObject
         ISyncthingService syncthingService,
         IFileTrackerService fileTrackerService,
         ISyncSchedulerService syncSchedulerService,
-        WebDavStorageService webDavService,
+        IConfigurationService configService,
         ILogger<TaskListViewModel> logger)
     {
         _taskRepository = taskRepository;
         _syncthingService = syncthingService;
         _fileTrackerService = fileTrackerService;
         _syncSchedulerService = syncSchedulerService;
-        _webDavService = webDavService;
+        _configService = configService;
         _logger = logger;
         _ = LoadTasksAsync();
     }
@@ -122,7 +120,6 @@ public partial class TaskListViewModel : ObservableObject
         // 如果没有设置下载路径，弹出文件选择框
         if (string.IsNullOrEmpty(task.DownloadPath))
         {
-            _logger.LogInformation("Download: No download path set, showing file picker");
             var topLevel = TopLevel.GetTopLevel(FileSyncTracker.UI.Views.MainWindow.Instance);
             if (topLevel == null)
             {
@@ -145,7 +142,6 @@ public partial class TaskListViewModel : ObservableObject
             }
 
             task.DownloadPath = files.Path.LocalPath;
-            _logger.LogInformation("Download: User selected path: {Path}", task.DownloadPath);
             await _taskRepository.UpdateAsync(task);
         }
 
@@ -154,7 +150,7 @@ public partial class TaskListViewModel : ObservableObject
 
         try
         {
-            var settings = await ReadSettingsAsync();
+            var settings = await _configService.GetSettingsAsync();
             if (settings == null)
             {
                 _logger.LogWarning("Download: Cannot read settings");
@@ -164,32 +160,26 @@ public partial class TaskListViewModel : ObservableObject
                 return;
             }
 
-            // Ensure download directory exists
             var downloadDir = Path.GetDirectoryName(task.DownloadPath);
             if (!string.IsNullOrEmpty(downloadDir) && !Directory.Exists(downloadDir))
                 Directory.CreateDirectory(downloadDir);
 
             var fileName = Path.GetFileName(task.CurrentPath);
-            _logger.LogInformation("Download: File name: {FileName}, Download path: {DownloadPath}", fileName, task.DownloadPath);
 
             foreach (var target in task.StorageTargets)
             {
                 try
                 {
-                    _logger.LogInformation("Download: Trying target {Target} (Type={Type})", target.ServerName, target.Type);
-                    var config = ResolveConfig(settings, target);
+                    var config = _configService.ResolveConfig(settings, target);
                     if (config == null)
                     {
                         _logger.LogWarning("Download: Cannot resolve config for {Target}", target.ServerName);
                         continue;
                     }
 
-                    // DownloadFileAsync 会自动添加 RemotePath，所以只传文件名
-                    _logger.LogInformation("Download: Downloading {FileName} from WebDAV", fileName);
-                    await _webDavService.DownloadFileAsync(config, fileName, task.DownloadPath);
+                    var service = _configService.GetCloudService(target.Type);
+                    await service.DownloadFileAsync(config, fileName, task.DownloadPath);
 
-                    _logger.LogInformation("Download: Download complete, updating task");
-                    // Update task path to download path
                     task.CurrentPath = task.DownloadPath;
                     task.PathIsValid = true;
                     task.Status = SyncStatus.Idle;
@@ -215,40 +205,5 @@ public partial class TaskListViewModel : ObservableObject
             task.LastError = ex.Message;
             await _taskRepository.UpdateAsync(task);
         }
-    }
-
-    private async Task<AppSettings?> ReadSettingsAsync()
-    {
-        var settingsPath = AppSettings.GetSettingsPath();
-        if (!File.Exists(settingsPath)) return null;
-
-        var raw = await File.ReadAllTextAsync(settingsPath);
-        var json = raw.TrimStart();
-        if (!json.StartsWith('{'))
-        {
-            var decrypted = SecureStorage.Decrypt(raw);
-            if (decrypted.StartsWith('{'))
-                json = decrypted;
-        }
-
-        return JsonSerializer.Deserialize<AppSettings>(json);
-    }
-
-    private static CloudStorageConfig? ResolveConfig(AppSettings settings, StorageTarget target)
-    {
-        return target.Type switch
-        {
-            StorageType.WebDAV => settings.WebDavServers
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.WebDAV,
-                    WebDavUrl = s.Url,
-                    WebDavUsername = s.Username,
-                    WebDavPassword = s.Password,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-            _ => null
-        };
     }
 }

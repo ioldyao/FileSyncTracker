@@ -9,9 +9,11 @@ public class TaskRepository : ITaskRepository
     private readonly SemaphoreSlim _lock = new(1, 1);
     private List<SyncTask> _tasks = new();
 
-    public TaskRepository()
+    public TaskRepository() : this(null) { }
+
+    public TaskRepository(string? basePath)
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var appData = basePath ?? Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var dir = Path.Combine(appData, "FileSyncTracker");
         Directory.CreateDirectory(dir);
         _filePath = Path.Combine(dir, "tasks.json");

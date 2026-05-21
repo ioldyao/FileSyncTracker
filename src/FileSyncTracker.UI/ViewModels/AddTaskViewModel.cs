@@ -2,11 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
-using FileSyncTracker.Core.Security;
 using FileSyncTracker.Core.Services;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,9 +18,7 @@ public partial class AddTaskViewModel : ObservableObject
     private readonly IFileTrackerService _fileTrackerService;
     private readonly ISyncthingService _syncthingService;
     private readonly ISyncSchedulerService _syncSchedulerService;
-    private readonly WebDavStorageService _webDavService;
-    private readonly OneDriveStorageService _oneDriveService;
-    private readonly S3StorageService _s3Service;
+    private readonly IConfigurationService _configService;
     private readonly ILogger<AddTaskViewModel> _logger;
 
     public event EventHandler? TaskCreated;
@@ -69,18 +64,14 @@ public partial class AddTaskViewModel : ObservableObject
         IFileTrackerService fileTrackerService,
         ISyncthingService syncthingService,
         ISyncSchedulerService syncSchedulerService,
-        WebDavStorageService webDavService,
-        OneDriveStorageService oneDriveService,
-        S3StorageService s3Service,
+        IConfigurationService configService,
         ILogger<AddTaskViewModel> logger)
     {
         _taskRepository = taskRepository;
         _fileTrackerService = fileTrackerService;
         _syncthingService = syncthingService;
         _syncSchedulerService = syncSchedulerService;
-        _webDavService = webDavService;
-        _oneDriveService = oneDriveService;
-        _s3Service = s3Service;
+        _configService = configService;
         _logger = logger;
     }
 
@@ -88,7 +79,7 @@ public partial class AddTaskViewModel : ObservableObject
     {
         try
         {
-            var settings = await ReadSettingsAsync();
+            var settings = await _configService.GetSettingsAsync();
             if (settings == null)
             {
                 _logger.LogWarning("Failed to read settings");
@@ -225,22 +216,26 @@ public partial class AddTaskViewModel : ObservableObject
             // Initial upload to all selected targets
             if (task.PathIsValid && task.StorageTargets.Count > 0)
             {
-                foreach (var target in task.StorageTargets)
+                var settings = await _configService.GetSettingsAsync();
+                if (settings != null)
                 {
-                    try
+                    foreach (var target in task.StorageTargets)
                     {
-                        var config = await ResolveConfigAsync(target);
-                        if (config == null) continue;
+                        try
+                        {
+                            var config = _configService.ResolveConfig(settings, target);
+                            if (config == null) continue;
 
-                        var service = GetCloudService(target.Type);
-                        if (task.Type == SyncTaskType.Folder)
-                            await service.UploadFolderAsync(config, task.CurrentPath, target.RemotePath);
-                        else
-                            await service.UploadFileAsync(config, task.CurrentPath, target.RemotePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Initial upload failed for target {Target}", target.ServerName);
+                            var service = _configService.GetCloudService(target.Type);
+                            if (task.Type == SyncTaskType.Folder)
+                                await service.UploadFolderAsync(config, task.CurrentPath, target.RemotePath);
+                            else
+                                await service.UploadFileAsync(config, task.CurrentPath, target.RemotePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(ex, "Initial upload failed for target {Target}", target.ServerName);
+                        }
                     }
                 }
             }
@@ -252,78 +247,5 @@ public partial class AddTaskViewModel : ObservableObject
             _logger.LogError(ex, "Failed to create task");
             ErrorOccurred?.Invoke(this, ex.Message);
         }
-    }
-
-    private async Task<CloudStorageConfig?> ResolveConfigAsync(StorageTarget target)
-    {
-        var settings = await ReadSettingsAsync();
-        if (settings == null) return null;
-
-        return target.Type switch
-        {
-            StorageType.WebDAV => settings.WebDavServers
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.WebDAV,
-                    WebDavUrl = s.Url,
-                    WebDavUsername = s.Username,
-                    WebDavPassword = s.Password,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-
-            StorageType.OneDrive => settings.OneDriveAccounts
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.OneDrive,
-                    OneDriveToken = s.AccessToken,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-
-            StorageType.S3 => settings.S3Servers
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.S3,
-                    S3Endpoint = s.Endpoint,
-                    S3Bucket = s.Bucket,
-                    S3AccessKey = s.AccessKey,
-                    S3SecretKey = s.SecretKey,
-                    S3Region = s.Region,
-                    S3UsePathStyle = s.UsePathStyle,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-
-            _ => null
-        };
-    }
-
-    private ICloudStorageService GetCloudService(StorageType type)
-    {
-        return type switch
-        {
-            StorageType.WebDAV => _webDavService,
-            StorageType.OneDrive => _oneDriveService,
-            StorageType.S3 => _s3Service,
-            _ => throw new ArgumentException($"Unsupported storage type: {type}")
-        };
-    }
-
-    private async Task<AppSettings?> ReadSettingsAsync()
-    {
-        var settingsPath = AppSettings.GetSettingsPath();
-        if (!System.IO.File.Exists(settingsPath)) return null;
-
-        var raw = await System.IO.File.ReadAllTextAsync(settingsPath);
-        var json = raw.TrimStart();
-        if (!json.StartsWith('{'))
-        {
-            var decrypted = SecureStorage.Decrypt(raw);
-            if (decrypted.StartsWith('{'))
-                json = decrypted;
-        }
-
-        return System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json);
     }
 }

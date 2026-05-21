@@ -1,12 +1,10 @@
 using FileSyncTracker.Core.Database;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
-using FileSyncTracker.Core.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Quartz.Impl;
-using System.Text.Json;
 
 namespace FileSyncTracker.Core.Services;
 
@@ -15,16 +13,19 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
     private readonly ILogger<SyncSchedulerService> _logger;
     private readonly ITaskRepository _taskRepository;
     private readonly ISyncthingService _syncthingService;
+    private readonly IConfigurationService _configService;
     private IScheduler? _scheduler;
 
     public SyncSchedulerService(
         ILogger<SyncSchedulerService> logger,
         ITaskRepository taskRepository,
-        ISyncthingService syncthingService)
+        ISyncthingService syncthingService,
+        IConfigurationService configService)
     {
         _logger = logger;
         _taskRepository = taskRepository;
         _syncthingService = syncthingService;
+        _configService = configService;
     }
 
     public async Task StartAsync()
@@ -79,7 +80,7 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
         {
             if (task.StorageTargets is { Count: > 0 })
             {
-                var settings = await ReadSettingsAsync();
+                var settings = await _configService.GetSettingsAsync();
                 if (settings == null)
                 {
                     _logger.LogWarning("TriggerNowAsync: Settings is null, cannot sync");
@@ -93,14 +94,14 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
                 {
                     try
                     {
-                        var config = ResolveConfig(settings, target);
+                        var config = _configService.ResolveConfig(settings, target);
                         if (config == null)
                         {
                             _logger.LogWarning("ResolveConfig returned null for {Target}", target.ServerName);
                             continue;
                         }
 
-                        var service = GetCloudService(target.Type);
+                        var service = _configService.GetCloudService(target.Type);
 
                         if (task.Type == SyncTaskType.Folder)
                             await SyncFolderAsync(task, service, config, target);
@@ -513,85 +514,6 @@ public class SyncSchedulerService : ISyncSchedulerService, IAsyncDisposable
 
         _logger.LogWarning("Conflict handled for {File}: local={LocalPath}, remote={RemotePath}",
             Path.GetFileName(localPath), conflictRemotePath);
-    }
-
-    private async Task<AppSettings?> ReadSettingsAsync()
-    {
-        var settingsPath = AppSettings.GetSettingsPath();
-        if (!File.Exists(settingsPath)) return null;
-
-        var raw = await File.ReadAllTextAsync(settingsPath);
-        var json = raw.TrimStart();
-        if (!json.StartsWith('{'))
-        {
-            try
-            {
-                var decrypted = SecureStorage.Decrypt(raw);
-                if (decrypted.StartsWith('{')) json = decrypted;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Settings decryption failed");
-            }
-        }
-
-        return JsonSerializer.Deserialize<AppSettings>(json);
-    }
-
-    private static CloudStorageConfig? ResolveConfig(AppSettings settings, StorageTarget target)
-    {
-        return target.Type switch
-        {
-            StorageType.WebDAV => settings.WebDavServers
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.WebDAV,
-                    WebDavUrl = s.Url,
-                    WebDavUsername = s.Username,
-                    WebDavPassword = s.Password,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-
-            StorageType.OneDrive => settings.OneDriveAccounts
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.OneDrive,
-                    OneDriveToken = s.AccessToken,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-
-            StorageType.S3 => settings.S3Servers
-                .Where(s => s.Id == target.ServerId)
-                .Select(s => new CloudStorageConfig
-                {
-                    StorageType = StorageType.S3,
-                    S3Endpoint = s.Endpoint,
-                    S3Bucket = s.Bucket,
-                    S3AccessKey = s.AccessKey,
-                    S3SecretKey = s.SecretKey,
-                    S3Region = s.Region,
-                    S3UsePathStyle = s.UsePathStyle,
-                    RemotePath = target.RemotePath
-                }).FirstOrDefault(),
-
-            _ => null
-        };
-    }
-
-    private ICloudStorageService GetCloudService(StorageType type)
-    {
-        return type switch
-        {
-            StorageType.WebDAV => new WebDavStorageService(
-                Microsoft.Extensions.Logging.Abstractions.NullLogger<WebDavStorageService>.Instance),
-            StorageType.OneDrive => new OneDriveStorageService(
-                Microsoft.Extensions.Logging.Abstractions.NullLogger<OneDriveStorageService>.Instance),
-            StorageType.S3 => new S3StorageService(
-                Microsoft.Extensions.Logging.Abstractions.NullLogger<S3StorageService>.Instance),
-            _ => throw new ArgumentException($"Unsupported storage type: {type}")
-        };
     }
 
     public async ValueTask DisposeAsync()

@@ -28,12 +28,13 @@ public partial class LogViewModel : ObservableObject
             .OrderByDescending(f => f)
             .FirstOrDefault() ?? string.Empty;
 
-        _ = Task.Run(async () =>
-        {
-            try { await LoadLogsAsync(); }
-            catch { }
-        });
         StartWatching();
+    }
+
+    public async Task InitializeAsync()
+    {
+        try { await LoadLogsAsync(); }
+        catch { }
     }
 
     private async Task LoadLogsAsync()

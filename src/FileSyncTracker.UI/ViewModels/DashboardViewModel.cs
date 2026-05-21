@@ -25,10 +25,9 @@ public partial class DashboardViewModel : ObservableObject
     public DashboardViewModel(ITaskRepository taskRepository)
     {
         _taskRepository = taskRepository;
-        _ = LoadDataAsync();
     }
 
-    private async Task LoadDataAsync()
+    public async Task InitializeAsync()
     {
         var tasks = await _taskRepository.GetAllAsync();
         TotalTasks = tasks.Count;
@@ -42,6 +41,6 @@ public partial class DashboardViewModel : ObservableObject
 
     public async Task RefreshAsync()
     {
-        await LoadDataAsync();
+        await InitializeAsync();
     }
 }

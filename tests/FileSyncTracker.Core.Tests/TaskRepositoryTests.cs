@@ -6,15 +6,13 @@ namespace FileSyncTracker.Core.Tests;
 
 public class TaskRepositoryTests : IDisposable
 {
+    private readonly string _tempDir;
     private readonly TaskRepository _repository;
-    private readonly string _testFilePath;
 
     public TaskRepositoryTests()
     {
-        _repository = new TaskRepository();
-        _testFilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "FileSyncTracker", "tasks.json");
+        _tempDir = Path.Combine(Path.GetTempPath(), "FileSyncTrackerTests", Guid.NewGuid().ToString());
+        _repository = new TaskRepository(_tempDir);
     }
 
     [Fact]
@@ -56,6 +54,7 @@ public class TaskRepositoryTests : IDisposable
 
         var tasks = await _repository.GetAllAsync();
         var updated = tasks.FirstOrDefault(t => t.Id == task.Id);
+        Assert.NotNull(updated);
         Assert.Equal("Updated", updated?.Name);
     }
 
@@ -70,12 +69,31 @@ public class TaskRepositoryTests : IDisposable
         Assert.Equal("Find Me", result.Name);
     }
 
+    [Fact]
+    public async Task GetAllAsync_ShouldReturnEmpty_WhenNoTasksExist()
+    {
+        var tasks = await _repository.GetAllAsync();
+        Assert.Empty(tasks);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldNotThrow_WhenTaskDoesNotExist()
+    {
+        await _repository.DeleteAsync(Guid.NewGuid());
+        var tasks = await _repository.GetAllAsync();
+        Assert.Empty(tasks);
+    }
+
     public void Dispose()
     {
-        // Cleanup test data
-        if (File.Exists(_testFilePath))
+        try
         {
-            try { File.WriteAllText(_testFilePath, "[]"); } catch { }
+            if (Directory.Exists(_tempDir))
+                Directory.Delete(_tempDir, true);
+        }
+        catch
+        {
+            // Best-effort cleanup
         }
     }
 }

@@ -1,12 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FileSyncTracker.Core.Models;
-using FileSyncTracker.Core.Security;
-using System;
-using System.Collections.Generic;
+using FileSyncTracker.Core.Services;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FileSyncTracker.UI.ViewModels;
@@ -42,12 +39,14 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _isEditingS3;
     [ObservableProperty] private S3ServerConfig? _editingS3;
 
-    public SettingsViewModel()
+    private readonly IConfigurationService _configService;
+
+    public SettingsViewModel(IConfigurationService configService)
     {
-        _ = InitializeAsync();
+        _configService = configService;
     }
 
-    private async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
         await LoadSettingsAsync();
         EverythingStatusText = System.Diagnostics.Process.GetProcessesByName("Everything").Length > 0
@@ -59,42 +58,10 @@ public partial class SettingsViewModel : ObservableObject
     {
         try
         {
-            var settingsPath = AppSettings.GetSettingsPath();
-            Debug.WriteLine($"[Settings] Loading from: {settingsPath}");
-
-            if (!System.IO.File.Exists(settingsPath))
-            {
-                Debug.WriteLine("[Settings] Settings file not found, using defaults");
-                return;
-            }
-
-            var raw = await System.IO.File.ReadAllTextAsync(settingsPath);
-            Debug.WriteLine($"[Settings] Read {raw.Length} bytes from settings file");
-
-            // Try decrypting (DPAPI encrypted file starts with valid base64, not '{')
-            var json = raw.TrimStart();
-            if (!json.StartsWith('{'))
-            {
-                var decrypted = SecureStorage.Decrypt(raw);
-                if (decrypted.StartsWith('{'))
-                {
-                    json = decrypted;
-                    Debug.WriteLine("[Settings] Decrypted successfully");
-                }
-                else
-                {
-                    Debug.WriteLine("[Settings] Decryption failed, trying as plain text");
-                }
-            }
-            else
-            {
-                Debug.WriteLine("[Settings] Plain text file (legacy), will encrypt on next save");
-            }
-
-            var settings = JsonSerializer.Deserialize<AppSettings>(json);
+            var settings = await _configService.GetSettingsAsync();
             if (settings == null)
             {
-                Debug.WriteLine("[Settings] Failed to deserialize settings");
+                Debug.WriteLine("[Settings] Settings file not found, using defaults");
                 return;
             }
 
@@ -130,8 +97,6 @@ public partial class SettingsViewModel : ObservableObject
     {
         try
         {
-            Debug.WriteLine("[Settings] Starting save...");
-
             var settings = new AppSettings
             {
                 EverythingPath = EverythingPath ?? string.Empty,
@@ -145,40 +110,12 @@ public partial class SettingsViewModel : ObservableObject
                 S3Servers = new List<S3ServerConfig>(S3Servers)
             };
 
-            Debug.WriteLine("[Settings] Settings object created");
-
-            var settingsPath = AppSettings.GetSettingsPath();
-            Debug.WriteLine($"[Settings] Path: {settingsPath}");
-
-            var dir = System.IO.Path.GetDirectoryName(settingsPath);
-            if (dir != null)
-            {
-                System.IO.Directory.CreateDirectory(dir);
-                Debug.WriteLine($"[Settings] Directory created: {dir}");
-            }
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-            };
-
-            Debug.WriteLine("[Settings] Serializing...");
-            var json = JsonSerializer.Serialize(settings, options);
-            Debug.WriteLine($"[Settings] JSON length: {json.Length}");
-
-            Debug.WriteLine("[Settings] Encrypting...");
-            var encrypted = SecureStorage.Encrypt(json);
-
-            Debug.WriteLine("[Settings] Writing file...");
-            await System.IO.File.WriteAllTextAsync(settingsPath, encrypted);
-
+            await _configService.SaveSettingsAsync(settings);
             Debug.WriteLine("[Settings] Save completed successfully!");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Settings] Save FAILED: {ex.Message}");
-            Debug.WriteLine($"[Settings] Stack trace: {ex.StackTrace}");
         }
     }
 
