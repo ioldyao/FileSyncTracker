@@ -12,6 +12,7 @@ namespace FileSyncTracker.UI.ViewModels;
 public partial class FilesViewModel : ObservableObject
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly SemaphoreSlim _lock = new(1, 1);
 
     public ObservableCollection<TaskGroupViewModel> TaskGroups { get; } = new();
     public IAsyncRelayCommand RefreshCommand { get; }
@@ -20,60 +21,61 @@ public partial class FilesViewModel : ObservableObject
     {
         _taskRepository = taskRepository;
         RefreshCommand = new AsyncRelayCommand(LoadAsync);
-        _ = LoadAsync();
     }
 
     public async Task RefreshAsync() => await LoadAsync();
 
     private async Task LoadAsync()
     {
-        TaskGroups.Clear();
-
-        var tasks = await _taskRepository.GetAllAsync();
-        var settings = await ReadSettingsAsync();
-        if (settings == null) return;
-
-        // 按服务器分组: key = ServerId, value = (ServerName, ServerType)
-        var serverMap = new Dictionary<Guid, (string Name, StorageType Type, List<SyncTask> Tasks)>();
-
-        foreach (var task in tasks.Where(t => t.StorageTargets is { Count: > 0 }))
+        if (!await _lock.WaitAsync(0)) return;
+        try
         {
-            foreach (var target in task.StorageTargets!)
+            TaskGroups.Clear();
+
+            var tasks = await _taskRepository.GetAllAsync();
+            var settings = await ReadSettingsAsync();
+            if (settings == null) return;
+
+            var serverMap = new Dictionary<Guid, (string Name, StorageType Type, List<SyncTask> Tasks)>();
+
+            foreach (var task in tasks.Where(t => t.StorageTargets is { Count: > 0 }))
             {
-                if (!serverMap.TryGetValue(target.ServerId, out var entry))
+                foreach (var target in task.StorageTargets!)
                 {
-                    entry = (target.ServerName, target.Type, new List<SyncTask>());
-                    serverMap[target.ServerId] = entry;
-                }
-                entry.Tasks.Add(task);
-            }
-        }
-
-        foreach (var (serverId, (serverName, serverType, serverTasks)) in serverMap)
-        {
-            var group = new TaskGroupViewModel
-            {
-                ServerName = serverName,
-                ServerType = serverType.ToString()
-            };
-
-            foreach (var task in serverTasks)
-            {
-                var target = task.StorageTargets!.First(t => t.ServerId == serverId);
-                var config = ResolveConfig(settings, target);
-                if (config == null) continue;
-
-                try
-                {
-                    var service = GetCloudService(target.Type);
-                    var files = await service.ListFilesAsync(config, "");
-
-                    foreach (var file in files)
+                    if (!serverMap.TryGetValue(target.ServerId, out var entry))
                     {
-                        var fileName = file.TrimEnd('/').Split('/').LastOrDefault() ?? file;
-                        var fileInfo = await service.GetFileInfoAsync(config, fileName);
+                        entry = (target.ServerName, target.Type, new List<SyncTask>());
+                        serverMap[target.ServerId] = entry;
+                    }
+                    entry.Tasks.Add(task);
+                }
+            }
 
-                        group.Files.Add(new RemoteFileItem
+            foreach (var (serverId, (serverName, serverType, serverTasks)) in serverMap)
+            {
+                var group = new TaskGroupViewModel
+                {
+                    ServerName = serverName,
+                    ServerType = serverType.ToString()
+                };
+
+                foreach (var task in serverTasks)
+                {
+                    var target = task.StorageTargets!.First(t => t.ServerId == serverId);
+                    var config = ResolveConfig(settings, target);
+                    if (config == null) continue;
+
+                    try
+                    {
+                        var service = GetCloudService(target.Type);
+                        var files = await service.ListFilesAsync(config, "");
+
+                        foreach (var file in files)
+                        {
+                            var fileName = file.TrimEnd('/').Split('/').LastOrDefault() ?? file;
+                            var fileInfo = await service.GetFileInfoAsync(config, fileName);
+
+                            group.Files.Add(new RemoteFileItem
                         {
                             FileName = fileName,
                             FileSize = fileInfo?.FileSize ?? 0,
@@ -94,6 +96,11 @@ public partial class FilesViewModel : ObservableObject
             }
 
             TaskGroups.Add(group);
+        }
+        }
+        finally
+        {
+            _lock.Release();
         }
     }
 
