@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using FileSyncTracker.UI.ViewModels;
 using FileSyncTracker.UI.Views.Pages;
@@ -82,6 +83,12 @@ public partial class MainWindow : Window
             vm.CurrentPage = page;
 
         UpdateNavButtons();
+    }
+
+    private void OnTitleBarPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            BeginMoveDrag(e);
     }
 
     private void OnMinimizeClick(object? sender, RoutedEventArgs e)
