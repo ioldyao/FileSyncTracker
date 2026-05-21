@@ -3,7 +3,6 @@ using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FileSyncTracker.Core.Models;
-using FileSyncTracker.Core.Repositories;
 using FileSyncTracker.Core.Services;
 using FileSyncTracker.UI.Views;
 using System.Collections.ObjectModel;
@@ -12,16 +11,14 @@ namespace FileSyncTracker.UI.ViewModels;
 
 public partial class FilesViewModel : ObservableObject
 {
-    private readonly ITaskRepository _taskRepository;
     private readonly IConfigurationService _configService;
     private readonly SemaphoreSlim _lock = new(1, 1);
 
     public ObservableCollection<TaskGroupViewModel> TaskGroups { get; } = new();
     public IAsyncRelayCommand RefreshCommand { get; }
 
-    public FilesViewModel(ITaskRepository taskRepository, IConfigurationService configService)
+    public FilesViewModel(IConfigurationService configService)
     {
-        _taskRepository = taskRepository;
         _configService = configService;
         RefreshCommand = new AsyncRelayCommand(LoadAsync);
     }
@@ -35,73 +32,150 @@ public partial class FilesViewModel : ObservableObject
         {
             TaskGroups.Clear();
 
-            var tasks = await _taskRepository.GetAllAsync();
             var settings = await _configService.GetSettingsAsync();
             if (settings == null) return;
 
-            var serverMap = new Dictionary<Guid, (string Name, StorageType Type, List<SyncTask> Tasks)>();
-
-            foreach (var task in tasks.Where(t => t.StorageTargets is { Count: > 0 }))
-            {
-                foreach (var target in task.StorageTargets!)
-                {
-                    if (!serverMap.TryGetValue(target.ServerId, out var entry))
-                    {
-                        entry = (target.ServerName, target.Type, new List<SyncTask>());
-                        serverMap[target.ServerId] = entry;
-                    }
-                    entry.Tasks.Add(task);
-                }
-            }
-
-            foreach (var (serverId, (serverName, serverType, serverTasks)) in serverMap)
+            // WebDAV servers
+            foreach (var server in settings.WebDavServers)
             {
                 var group = new TaskGroupViewModel
                 {
-                    ServerName = serverName,
-                    ServerType = serverType.ToString()
+                    ServerName = server.Name,
+                    ServerType = nameof(StorageType.WebDAV)
                 };
 
-                foreach (var task in serverTasks)
+                var config = new CloudStorageConfig
                 {
-                    var target = task.StorageTargets!.First(t => t.ServerId == serverId);
-                    var config = _configService.ResolveConfig(settings, target);
-                    if (config == null) continue;
+                    StorageType = StorageType.WebDAV,
+                    WebDavUrl = server.Url,
+                    WebDavUsername = server.Username,
+                    WebDavPassword = server.Password,
+                    RemotePath = server.RemotePath
+                };
 
-                    try
+                try
+                {
+                    var service = _configService.GetCloudService(StorageType.WebDAV);
+                    var files = await service.ListFilesAsync(config, "");
+
+                    foreach (var file in files)
                     {
-                        var service = _configService.GetCloudService(target.Type);
-                        var files = await service.ListFilesAsync(config, "");
+                        var fileName = file.TrimEnd('/').Split('/').LastOrDefault() ?? file;
+                        var fileInfo = await service.GetFileInfoAsync(config, fileName);
 
-                        foreach (var file in files)
-                        {
-                            var fileName = file.TrimEnd('/').Split('/').LastOrDefault() ?? file;
-                            var fileInfo = await service.GetFileInfoAsync(config, fileName);
-
-                            group.Files.Add(new RemoteFileItem
+                        group.Files.Add(new RemoteFileItem
                         {
                             FileName = fileName,
                             FileSize = fileInfo?.FileSize ?? 0,
                             LastModified = fileInfo?.LastModified ?? DateTime.MinValue,
-                            TaskName = task.Name,
                             RemotePath = file,
-                            ServerType = target.Type,
+                            ServerType = StorageType.WebDAV,
                             Config = config
                         });
                     }
                 }
                 catch (Exception ex)
                 {
-                    group.Files.Add(new RemoteFileItem
-                    {
-                        FileName = $"[加载失败: {ex.Message}]",
-                        TaskName = task.Name
-                    });
+                    group.Files.Add(new RemoteFileItem { FileName = $"[加载失败: {ex.Message}]" });
                 }
+
+                TaskGroups.Add(group);
             }
 
-            TaskGroups.Add(group);
-        }
+            // OneDrive accounts
+            foreach (var account in settings.OneDriveAccounts)
+            {
+                var group = new TaskGroupViewModel
+                {
+                    ServerName = account.Name,
+                    ServerType = nameof(StorageType.OneDrive)
+                };
+
+                var config = new CloudStorageConfig
+                {
+                    StorageType = StorageType.OneDrive,
+                    OneDriveToken = account.AccessToken,
+                    RemotePath = account.RemotePath
+                };
+
+                try
+                {
+                    var service = _configService.GetCloudService(StorageType.OneDrive);
+                    var files = await service.ListFilesAsync(config, "");
+
+                    foreach (var file in files)
+                    {
+                        var fileName = file.TrimEnd('/').Split('/').LastOrDefault() ?? file;
+                        var fileInfo = await service.GetFileInfoAsync(config, fileName);
+
+                        group.Files.Add(new RemoteFileItem
+                        {
+                            FileName = fileName,
+                            FileSize = fileInfo?.FileSize ?? 0,
+                            LastModified = fileInfo?.LastModified ?? DateTime.MinValue,
+                            RemotePath = file,
+                            ServerType = StorageType.OneDrive,
+                            Config = config
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    group.Files.Add(new RemoteFileItem { FileName = $"[加载失败: {ex.Message}]" });
+                }
+
+                TaskGroups.Add(group);
+            }
+
+            // S3 servers
+            foreach (var server in settings.S3Servers)
+            {
+                var group = new TaskGroupViewModel
+                {
+                    ServerName = server.Name,
+                    ServerType = nameof(StorageType.S3)
+                };
+
+                var config = new CloudStorageConfig
+                {
+                    StorageType = StorageType.S3,
+                    S3Endpoint = server.Endpoint,
+                    S3Bucket = server.Bucket,
+                    S3AccessKey = server.AccessKey,
+                    S3SecretKey = server.SecretKey,
+                    S3Region = server.Region,
+                    S3UsePathStyle = server.UsePathStyle,
+                    RemotePath = server.RemotePath
+                };
+
+                try
+                {
+                    var service = _configService.GetCloudService(StorageType.S3);
+                    var files = await service.ListFilesAsync(config, "");
+
+                    foreach (var file in files)
+                    {
+                        var fileName = file.TrimEnd('/').Split('/').LastOrDefault() ?? file;
+                        var fileInfo = await service.GetFileInfoAsync(config, fileName);
+
+                        group.Files.Add(new RemoteFileItem
+                        {
+                            FileName = fileName,
+                            FileSize = fileInfo?.FileSize ?? 0,
+                            LastModified = fileInfo?.LastModified ?? DateTime.MinValue,
+                            RemotePath = file,
+                            ServerType = StorageType.S3,
+                            Config = config
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    group.Files.Add(new RemoteFileItem { FileName = $"[加载失败: {ex.Message}]" });
+                }
+
+                TaskGroups.Add(group);
+            }
         }
         finally
         {
@@ -151,7 +225,6 @@ public class RemoteFileItem
     public string FileName { get; set; } = string.Empty;
     public long FileSize { get; set; }
     public DateTime LastModified { get; set; }
-    public string TaskName { get; set; } = string.Empty;
     public string RemotePath { get; set; } = string.Empty;
     public StorageType ServerType { get; set; }
     public CloudStorageConfig? Config { get; set; }

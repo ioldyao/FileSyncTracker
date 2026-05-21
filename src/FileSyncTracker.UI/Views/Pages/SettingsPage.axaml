@@ -94,6 +94,10 @@
                         <TextBlock Text="Password" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
                         <TextBox Text="{Binding EditingWebDav.Password}" Classes="input" PasswordChar="*"/>
                     </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                        <TextBox Text="{Binding EditingWebDav.RemotePath}" Classes="input" Watermark="/"/>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                         <Button Content="{DynamicResource Cancel}" Classes="secondary"
                                 Command="{Binding CancelWebDavCommand}"/>
@@ -163,6 +167,10 @@
                     <StackPanel Spacing="4">
                         <TextBlock Text="Refresh Token" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
                         <TextBox Text="{Binding EditingOneDrive.RefreshToken}" Classes="input" PasswordChar="*"/>
+                    </StackPanel>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                        <TextBox Text="{Binding EditingOneDrive.RemotePath}" Classes="input" Watermark="/"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                         <Button Content="{DynamicResource Cancel}" Classes="secondary"
@@ -247,6 +255,10 @@
                         <TextBox Text="{Binding EditingS3.Region}" Classes="input" Watermark="cn-hangzhou"/>
                     </StackPanel>
                     <CheckBox Content="Use Path Style" IsChecked="{Binding EditingS3.UsePathStyle}"/>
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                        <TextBox Text="{Binding EditingS3.RemotePath}" Classes="input" Watermark="/"/>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
                         <Button Content="{DynamicResource Cancel}" Classes="secondary"
                                 Command="{Binding CancelS3Command}"/>

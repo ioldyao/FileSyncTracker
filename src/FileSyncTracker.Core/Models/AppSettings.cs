@@ -30,6 +30,7 @@ public class WebDavServerConfig
     public string Url { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+    public string RemotePath { get; set; } = "/";
 }
 
 public class OneDriveServerConfig
@@ -38,6 +39,7 @@ public class OneDriveServerConfig
     public string Name { get; set; } = string.Empty;       // e.g. "个人OneDrive", "工作OneDrive"
     public string AccessToken { get; set; } = string.Empty;
     public string RefreshToken { get; set; } = string.Empty;
+    public string RemotePath { get; set; } = "/";
 }
 
 public class S3ServerConfig
@@ -50,4 +52,5 @@ public class S3ServerConfig
     public string SecretKey { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;
     public bool UsePathStyle { get; set; } = true;
+    public string RemotePath { get; set; } = "/";
 }
