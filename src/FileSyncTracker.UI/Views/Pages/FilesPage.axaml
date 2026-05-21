@@ -1,7 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:FileSyncTracker.UI.ViewModels"
-             x:Class="FileSyncTracker.UI.Views.Pages.FilesPage">
+             x:Class="FileSyncTracker.UI.Views.Pages.FilesPage"
+             x:DataType="vm:FilesViewModel">
 
     <Border Padding="28,24">
         <Grid RowDefinitions="Auto,*">
@@ -17,7 +18,7 @@
 
             <!-- Server Groups -->
             <ScrollViewer Grid.Row="1">
-                <ItemsControl ItemsSource="{Binding TaskGroups}">
+                <ItemsControl x:Name="TaskGroupsControl" ItemsSource="{Binding TaskGroups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,0,0,24">
@@ -47,11 +48,12 @@
                                     <StackPanel>
                                         <!-- Table Header -->
                                         <Border Padding="12,8" Background="{DynamicResource Surface1Brush}">
-                                        <Grid ColumnDefinitions="*,100,140,160">
+                                        <Grid ColumnDefinitions="*,100,140,120,70">
                                             <TextBlock Grid.Column="0" Text="文件名" Classes="table-header"/>
                                             <TextBlock Grid.Column="1" Text="大小" Classes="table-header"/>
                                             <TextBlock Grid.Column="2" Text="修改时间" Classes="table-header"/>
                                             <TextBlock Grid.Column="3" Text="任务" Classes="table-header"/>
+                                            <TextBlock Grid.Column="4" Text="" Classes="table-header"/>
                                         </Grid>
                                         </Border>
 
@@ -60,7 +62,7 @@
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <Border Classes="table-row">
-                                                        <Grid ColumnDefinitions="*,100,140,160">
+                                                        <Grid ColumnDefinitions="*,100,140,120,60">
                                                             <TextBlock Grid.Column="0" Text="{Binding FileName}"
                                                                        FontSize="13" TextTrimming="CharacterEllipsis"
                                                                        Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -74,6 +76,10 @@
                                                                        FontSize="12" VerticalAlignment="Center"
                                                                        Foreground="{DynamicResource TextSecondaryBrush}"
                                                                        TextTrimming="CharacterEllipsis"/>
+                                                            <Button Grid.Column="4" Content="下载" Classes="secondary sm"
+                                                                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                    Command="{Binding ElementName=TaskGroupsControl, Path=DataContext.DownloadFileCommand}"
+                                                                    CommandParameter="{Binding}"/>
                                                         </Grid>
                                                     </Border>
                                                 </DataTemplate>

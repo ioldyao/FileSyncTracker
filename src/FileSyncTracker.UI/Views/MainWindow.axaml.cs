@@ -35,12 +35,9 @@ public partial class MainWindow : Window
 
     private void UpdateNavButtons()
     {
-        if (Content is not Grid rootGrid) return;
-        if (rootGrid.Children[1] is not Grid mainGrid) return;
-        if (mainGrid.Children[0] is not Border sidebarBorder) return;
-        if (sidebarBorder.Child is not DockPanel dockPanel) return;
+        if (SidebarDockPanel == null) return;
 
-        foreach (var child in dockPanel.Children)
+        foreach (var child in SidebarDockPanel.Children)
         {
             if (child is StackPanel stack)
             {
@@ -81,8 +78,8 @@ public partial class MainWindow : Window
             await dvm.RefreshAsync();
 
         _currentPage = pageName;
-        ContentPanel?.Children.Clear();
-        ContentPanel?.Children.Add(page);
+        if (DataContext is MainWindowViewModel vm)
+            vm.CurrentPage = page;
 
         UpdateNavButtons();
     }

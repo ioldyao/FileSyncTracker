@@ -3,7 +3,8 @@
              xmlns:vm="using:FileSyncTracker.UI.ViewModels"
              xmlns:models="using:FileSyncTracker.Core.Models"
              xmlns:local="using:FileSyncTracker.UI.Converters"
-             x:Class="FileSyncTracker.UI.Views.Pages.TaskListPage">
+             x:Class="FileSyncTracker.UI.Views.Pages.TaskListPage"
+             x:DataType="vm:TaskListViewModel">
 
     <Border Padding="28,24">
         <Grid RowDefinitions="Auto,Auto,*">

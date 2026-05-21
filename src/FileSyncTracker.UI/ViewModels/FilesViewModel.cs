@@ -1,8 +1,11 @@
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FileSyncTracker.Core.Models;
 using FileSyncTracker.Core.Repositories;
 using FileSyncTracker.Core.Services;
+using FileSyncTracker.UI.Views;
 using System.Collections.ObjectModel;
 
 namespace FileSyncTracker.UI.ViewModels;
@@ -81,7 +84,9 @@ public partial class FilesViewModel : ObservableObject
                             FileSize = fileInfo?.FileSize ?? 0,
                             LastModified = fileInfo?.LastModified ?? DateTime.MinValue,
                             TaskName = task.Name,
-                            RemotePath = file
+                            RemotePath = file,
+                            ServerType = target.Type,
+                            Config = config
                         });
                     }
                 }
@@ -104,6 +109,34 @@ public partial class FilesViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private async Task DownloadFileAsync(RemoteFileItem? item)
+    {
+        if (item?.Config == null) return;
+
+        var topLevel = TopLevel.GetTopLevel(MainWindow.Instance);
+        if (topLevel == null) return;
+
+        var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+        {
+            Title = "选择下载保存位置",
+            SuggestedFileName = item.FileName,
+            DefaultExtension = Path.GetExtension(item.FileName)
+        });
+
+        if (file == null) return;
+
+        try
+        {
+            var service = _configService.GetCloudService(item.ServerType);
+            await service.DownloadFileAsync(item.Config, item.RemotePath, file.Path.LocalPath);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[Download] Failed: {ex.Message}");
+        }
+    }
+
 }
 
 public class TaskGroupViewModel
@@ -120,6 +153,8 @@ public class RemoteFileItem
     public DateTime LastModified { get; set; }
     public string TaskName { get; set; } = string.Empty;
     public string RemotePath { get; set; } = string.Empty;
+    public StorageType ServerType { get; set; }
+    public CloudStorageConfig? Config { get; set; }
 
     public string FileSizeDisplay => FileSize switch
     {

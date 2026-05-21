@@ -32,7 +32,7 @@
             <!-- Icon Sidebar -->
             <Border Grid.Column="0" Background="{DynamicResource Surface0Brush}"
                     BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
-                <DockPanel>
+                <DockPanel x:Name="SidebarDockPanel">
                     <!-- Top Navigation Icons -->
                     <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="0,12,0,0" HorizontalAlignment="Center">
                         <!-- Dashboard -->
@@ -81,7 +81,7 @@
             </Border>
 
             <!-- Content Area -->
-            <Panel Grid.Column="1" x:Name="ContentPanel" Background="{DynamicResource AppBackgroundBrush}"/>
+            <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" Background="{DynamicResource AppBackgroundBrush}"/>
         </Grid>
     </Grid>
 </Window>

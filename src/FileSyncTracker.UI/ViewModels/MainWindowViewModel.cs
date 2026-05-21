@@ -20,6 +20,9 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private string _syncthingStatus = "Stopped";
 
+    [ObservableProperty]
+    private object? _currentPage;
+
     public ObservableCollection<SyncTask> Tasks { get; } = new();
 
     public MainWindowViewModel(

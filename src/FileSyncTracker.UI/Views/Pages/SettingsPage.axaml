@@ -1,7 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:FileSyncTracker.UI.ViewModels"
-             x:Class="FileSyncTracker.UI.Views.Pages.SettingsPage">
+             x:Class="FileSyncTracker.UI.Views.Pages.SettingsPage"
+             x:DataType="vm:SettingsViewModel">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,24">
         <StackPanel Spacing="0" MaxWidth="720">
