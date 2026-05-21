@@ -6,40 +6,57 @@
              x:Class="FileSyncTracker.UI.Views.Pages.AddTaskPage"
              x:DataType="vm:AddTaskViewModel">
 
-    <Border Padding="24">
+    <Border Padding="28,24">
         <Grid RowDefinitions="Auto,*,Auto">
             <!-- Header -->
-            <TextBlock Grid.Row="0" Text="{DynamicResource AddTaskTitle}" Classes="page-header" Margin="0,0,0,16"/>
+            <StackPanel Grid.Row="0" Margin="0,0,0,4">
+                <TextBlock Text="{DynamicResource AddTaskTitle}" Classes="page-header"/>
+                <TextBlock Text="Create a new sync task" Classes="page-subtitle"/>
+            </StackPanel>
 
             <!-- Step Content -->
-            <Border Grid.Row="1" Classes="card">
+            <Border Grid.Row="1" Classes="table-container">
                 <ScrollViewer>
-                    <StackPanel Spacing="20">
+                    <Border Padding="24">
+                    <StackPanel Spacing="24">
                         <!-- Step Indicator -->
-                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                            <Ellipse Width="12" Height="12" Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=1}"/>
-                            <Ellipse Width="12" Height="12" Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=2}"/>
-                            <Ellipse Width="12" Height="12" Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=3}"/>
-                            <Ellipse Width="12" Height="12" Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=4}"/>
-                        </StackPanel>
+                        <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*" HorizontalAlignment="Center" Margin="0,0,0,8">
+                            <!-- Step 1 -->
+                            <Ellipse Grid.Column="0" Width="28" Height="28" HorizontalAlignment="Center"
+                                     Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=1}"/>
+                            <Border Grid.Column="1" Height="2" Width="40" Background="{DynamicResource BorderBrush}" VerticalAlignment="Center"/>
+                            <!-- Step 2 -->
+                            <Ellipse Grid.Column="2" Width="28" Height="28" HorizontalAlignment="Center"
+                                     Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=2}"/>
+                            <Border Grid.Column="3" Height="2" Width="40" Background="{DynamicResource BorderBrush}" VerticalAlignment="Center"/>
+                            <!-- Step 3 -->
+                            <Ellipse Grid.Column="4" Width="28" Height="28" HorizontalAlignment="Center"
+                                     Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=3}"/>
+                            <Border Grid.Column="5" Height="2" Width="40" Background="{DynamicResource BorderBrush}" VerticalAlignment="Center"/>
+                            <!-- Step 4 -->
+                            <Ellipse Grid.Column="6" Width="28" Height="28" HorizontalAlignment="Center"
+                                     Fill="{Binding CurrentStep, Converter={x:Static local:StepToFillConverter.Instance}, ConverterParameter=4}"/>
+                        </Grid>
 
                         <!-- Step 1: Type Selection -->
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=1}">
                             <TextBlock Text="{DynamicResource SelectTaskType}" Classes="section-title"/>
                             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <Border Grid.Column="0" CornerRadius="8" Padding="16" Margin="0,0,8,0"
+                                <Border Grid.Column="0" CornerRadius="10" Padding="20" Margin="0,0,8,0"
                                         Cursor="Hand" PointerPressed="OnFolderSelected"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                         Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=Folder}">
-                                    <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                        <TextBlock Text="📁" FontSize="32" HorizontalAlignment="Center"/>
+                                    <StackPanel HorizontalAlignment="Center" Spacing="10">
+                                        <TextBlock Text="📁" FontSize="36" HorizontalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource FolderType}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
-                                <Border Grid.Column="1" CornerRadius="8" Padding="16" Margin="8,0,0,0"
+                                <Border Grid.Column="1" CornerRadius="10" Padding="20" Margin="8,0,0,0"
                                         Cursor="Hand" PointerPressed="OnFileSelected"
+                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
                                         Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=File}">
-                                    <StackPanel HorizontalAlignment="Center" Spacing="8">
-                                        <TextBlock Text="📄" FontSize="32" HorizontalAlignment="Center"/>
+                                    <StackPanel HorizontalAlignment="Center" Spacing="10">
+                                        <TextBlock Text="📄" FontSize="36" HorizontalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource SingleFileType}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
@@ -49,12 +66,18 @@
                         <!-- Step 2: Path Selection -->
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=2}">
                             <TextBlock Text="{DynamicResource SelectPath}" Classes="section-title"/>
-                            <TextBox Text="{Binding TaskName}" Watermark="{DynamicResource TaskName}" Classes="input"/>
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding LocalPath}" Watermark="{DynamicResource LocalPath}" Classes="input" Margin="0,0,8,0"/>
-                                <Button Grid.Column="1" Content="{DynamicResource Browse}" Classes="accent"
-                                        Click="OnBrowseClick"/>
-                            </Grid>
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{DynamicResource TaskName}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding TaskName}" Watermark="{DynamicResource TaskName}" Classes="input"/>
+                            </StackPanel>
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{DynamicResource LocalPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBox Grid.Column="0" Text="{Binding LocalPath}" Watermark="{DynamicResource LocalPath}" Classes="input" Margin="0,0,8,0"/>
+                                    <Button Grid.Column="1" Content="{DynamicResource Browse}" Classes="accent"
+                                            Click="OnBrowseClick"/>
+                                </Grid>
+                            </StackPanel>
                         </StackPanel>
 
                         <!-- Step 3: Storage Selection -->
@@ -63,13 +86,21 @@
                             <TextBlock Text="{DynamicResource SelectBackupTargets}" FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
 
                             <!-- Remote Path -->
-                            <TextBox Text="{Binding RemotePath}" Watermark="Remote Path (e.g., /backup)" Classes="input"/>
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding RemotePath}" Watermark="Remote Path (e.g., /backup)" Classes="input"/>
+                            </StackPanel>
 
-                            <!-- Download Path (when file not found locally, download to this path) -->
-                            <TextBox Text="{Binding DownloadPath}" Watermark="Download Path (e.g., C:\MyFiles, optional)" Classes="input"/>
+                            <!-- Download Path -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Download Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding DownloadPath}" Watermark="Download Path (e.g., C:\MyFiles, optional)" Classes="input"/>
+                            </StackPanel>
 
                             <!-- No servers configured hint -->
-                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12" IsVisible="{Binding !HasAnyCloud}">
+                            <Border Background="{DynamicResource Surface2Brush}" CornerRadius="8" Padding="12"
+                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
+                                    IsVisible="{Binding !HasAnyCloud}">
                                 <TextBlock Text="{DynamicResource NoCloudConfigured}"
                                            FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                             </Border>
@@ -80,8 +111,7 @@
                                 <ItemsControl ItemsSource="{Binding AvailableWebDav}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2"
-                                                    Cursor="Hand" Tag="{Binding}"
+                                            <Border Classes="table-row" Cursor="Hand" Tag="{Binding}"
                                                     PointerPressed="OnServerCardPressed">
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0"
@@ -103,8 +133,7 @@
                                 <ItemsControl ItemsSource="{Binding AvailableOneDrive}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2"
-                                                    Cursor="Hand" Tag="{Binding}"
+                                            <Border Classes="table-row" Cursor="Hand" Tag="{Binding}"
                                                     PointerPressed="OnServerCardPressed">
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0"
@@ -123,8 +152,7 @@
                                 <ItemsControl ItemsSource="{Binding AvailableS3}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2"
-                                                    Cursor="Hand" Tag="{Binding}"
+                                            <Border Classes="table-row" Cursor="Hand" Tag="{Binding}"
                                                     PointerPressed="OnServerCardPressed">
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <Ellipse Grid.Column="0" Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0"
@@ -141,13 +169,12 @@
                             </StackPanel>
 
                             <!-- Selected targets summary -->
-                            <Border CornerRadius="6" Padding="12">
-                                <Border.Background>
-                                    <SolidColorBrush Color="#5B6CF8" Opacity="0.12"/>
-                                </Border.Background>
+                            <Border CornerRadius="8" Padding="12"
+                                    Background="{DynamicResource AccentSubtleBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="{DynamicResource SelectedTargets}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                    <TextBlock Text="{Binding SelectedTargets.Count}" FontSize="12" Foreground="{DynamicResource InfoBrush}"/>
+                                    <TextBlock Text="{Binding SelectedTargets.Count}" FontSize="12" Foreground="{DynamicResource AccentBrush}"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -156,14 +183,16 @@
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=4}">
                             <TextBlock Text="{DynamicResource SyncMode}" Classes="section-title"/>
                             <RadioButton Content="{DynamicResource RealTime}" GroupName="SyncMode"
-                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14"
-                                         IsChecked="{Binding IsRealTimeMode}"/>
+                                         FontSize="13" IsChecked="{Binding IsRealTimeMode}"/>
                             <RadioButton Content="{DynamicResource Scheduled}" GroupName="SyncMode"
-                                         Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14"
-                                         IsChecked="{Binding IsScheduledMode}"/>
-                            <TextBox Text="{Binding CronExpression}" Watermark="{DynamicResource CronExpression}" Classes="input"/>
+                                         FontSize="13" IsChecked="{Binding IsScheduledMode}"/>
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Cron Expression" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding CronExpression}" Watermark="{DynamicResource CronExpression}" Classes="input"/>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
+                    </Border>
                 </ScrollViewer>
             </Border>
 

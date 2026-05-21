@@ -35,20 +35,25 @@ public partial class MainWindow : Window
 
     private void UpdateNavButtons()
     {
-        // Find the nav StackPanel inside the first Grid row
         if (Content is not Grid rootGrid) return;
         if (rootGrid.Children[1] is not Grid mainGrid) return;
-        if (mainGrid.Children[0] is not Border navBorder) return;
-        if (navBorder.Child is not StackPanel navStack) return;
+        if (mainGrid.Children[0] is not Border sidebarBorder) return;
+        if (sidebarBorder.Child is not DockPanel dockPanel) return;
 
-        foreach (var child in navStack.Children)
+        foreach (var child in dockPanel.Children)
         {
-            if (child is Button navBtn && navBtn.Tag is string tag)
+            if (child is StackPanel stack)
             {
-                if (tag == _currentPage)
-                    navBtn.Classes.Add("active");
-                else
-                    navBtn.Classes.Remove("active");
+                foreach (var btn in stack.Children)
+                {
+                    if (btn is Button navBtn && navBtn.Tag is string tag)
+                    {
+                        if (tag == _currentPage)
+                            navBtn.Classes.Add("active");
+                        else
+                            navBtn.Classes.Remove("active");
+                    }
+                }
             }
         }
     }
@@ -68,7 +73,6 @@ public partial class MainWindow : Window
 
         if (page == null) return;
 
-        // Refresh data when navigating to existing pages
         if (pageName == "Tasks" && _taskListPage?.DataContext is TaskListViewModel tvm)
             await tvm.RefreshAsync();
         else if (pageName == "Files" && _filesPage?.DataContext is FilesViewModel fvm)

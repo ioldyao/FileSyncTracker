@@ -2,25 +2,37 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     x:Class="FileSyncTracker.UI.Themes.Colors">
 
-    <!-- Catppuccin Mocha Palette -->
-    <!-- Background -->
-    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#1E1E2E"/>
-    <SolidColorBrush x:Key="Surface0Brush" Color="#181825"/>
-    <SolidColorBrush x:Key="Surface1Brush" Color="#11111B"/>
-    <SolidColorBrush x:Key="Surface2Brush" Color="#313244"/>
-    <SolidColorBrush x:Key="Surface3Brush" Color="#45475A"/>
+    <!-- Background layers -->
+    <SolidColorBrush x:Key="AppBackgroundBrush" Color="#0F0F14"/>
+    <SolidColorBrush x:Key="Surface0Brush" Color="#141419"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#1A1A22"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#22222D"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#2C2C3A"/>
+
+    <!-- Borders -->
+    <SolidColorBrush x:Key="BorderBrush" Color="#2A2A38"/>
+    <SolidColorBrush x:Key="BorderHoverBrush" Color="#3A3A4A"/>
+
+    <!-- Hover / Focus -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#1E1E2A"/>
+    <SolidColorBrush x:Key="FocusBrush" Color="#5B6CF8"/>
 
     <!-- Text -->
-    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#CDD6F4"/>
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6C7086"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#E0E0EA"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#6B6B80"/>
+    <SolidColorBrush x:Key="TextTertiaryBrush" Color="#4A4A5C"/>
 
     <!-- Accent -->
     <SolidColorBrush x:Key="AccentBrush" Color="#5B6CF8"/>
     <SolidColorBrush x:Key="AccentHoverBrush" Color="#7B8CFF"/>
+    <SolidColorBrush x:Key="AccentSubtleBrush" Color="#5B6CF818"/>
+
+    <!-- Navigation -->
+    <SolidColorBrush x:Key="NavActiveIndicatorBrush" Color="#5B6CF8"/>
 
     <!-- Semantic -->
-    <SolidColorBrush x:Key="SuccessBrush" Color="#A6E3A1"/>
-    <SolidColorBrush x:Key="ErrorBrush" Color="#F38BA8"/>
-    <SolidColorBrush x:Key="InfoBrush" Color="#89B4FA"/>
-    <SolidColorBrush x:Key="WarningBrush" Color="#FAB387"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="#4ADE80"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="#F87171"/>
+    <SolidColorBrush x:Key="InfoBrush" Color="#60A5FA"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#FBBF24"/>
 </ResourceDictionary>

@@ -6,78 +6,82 @@
         x:Class="FileSyncTracker.UI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="{DynamicResource AppTitle}"
-        Width="960" Height="640"
+        Width="1024" Height="680"
         MinWidth="800" MinHeight="500"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource AppBackgroundBrush}">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*">
 
         <!-- Title Bar -->
-        <Border Grid.Row="0" Background="{DynamicResource Surface0Brush}" Padding="12,8">
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="{DynamicResource AppTitle}" FontSize="16" FontWeight="Bold"
-                               Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+        <Border Grid.Row="0" Background="{DynamicResource Surface0Brush}" Padding="16,8"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="FileSyncTracker" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2">
+                    <Button Content="-" Classes="icon" Click="OnMinimizeClick"/>
+                    <Button Content="X" Classes="icon" Click="OnCloseClick"/>
                 </StackPanel>
-                <Panel Grid.Column="2"/>
-                <Button Grid.Column="3" Content="-" Width="32" Height="28" Background="Transparent"
-                        Foreground="{DynamicResource TextPrimaryBrush}" Click="OnMinimizeClick"/>
-                <Button Grid.Column="4" Content="X" Width="32" Height="28" Background="Transparent"
-                        Foreground="{DynamicResource TextPrimaryBrush}" Click="OnCloseClick"/>
             </Grid>
         </Border>
 
-        <!-- Main Content -->
-        <Grid Grid.Row="1" ColumnDefinitions="200,*">
+        <!-- Main Content: Sidebar + Content -->
+        <Grid Grid.Row="1" ColumnDefinitions="48,*">
 
-            <!-- Left Navigation -->
-            <Border Grid.Column="0" Background="{DynamicResource Surface1Brush}" Padding="8">
-                <StackPanel Spacing="4">
-                    <Button Classes="nav-btn" Content="{DynamicResource NavDashboard}" Tag="Dashboard" Click="OnNavClick"/>
-                    <Button Classes="nav-btn" Content="{DynamicResource NavTasks}" Tag="Tasks" Click="OnNavClick"/>
-                    <Button Classes="nav-btn" Content="{DynamicResource NavFiles}" Tag="Files" Click="OnNavClick"/>
-                    <Button Classes="nav-btn" Content="{DynamicResource NavSettings}" Tag="Settings" Click="OnNavClick"/>
-                    <Button Classes="nav-btn" Content="{DynamicResource NavLogs}" Tag="Logs" Click="OnNavClick"/>
-                </StackPanel>
+            <!-- Icon Sidebar -->
+            <Border Grid.Column="0" Background="{DynamicResource Surface0Brush}"
+                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <!-- Top Navigation Icons -->
+                    <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="0,12,0,0" HorizontalAlignment="Center">
+                        <!-- Dashboard -->
+                        <Button Classes="sidebar-btn" Tag="Dashboard" Click="OnNavClick"
+                                ToolTip.Tip="Dashboard" HorizontalAlignment="Center">
+                            <Path Data="M3,13h8V3H3V13z M3,21h8v-6H3V21z M13,21h8V11h-8V21z M13,3v6h8V3H13z"
+                                  Width="18" Height="18"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+
+                        <!-- Tasks -->
+                        <Button Classes="sidebar-btn" Tag="Tasks" Click="OnNavClick"
+                                ToolTip.Tip="Tasks" HorizontalAlignment="Center">
+                            <Path Data="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"
+                                  Width="18" Height="18"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+
+                        <!-- Files -->
+                        <Button Classes="sidebar-btn" Tag="Files" Click="OnNavClick"
+                                ToolTip.Tip="Files" HorizontalAlignment="Center">
+                            <Path Data="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
+                                  Width="18" Height="18"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+
+                        <!-- Logs -->
+                        <Button Classes="sidebar-btn" Tag="Logs" Click="OnNavClick"
+                                ToolTip.Tip="Logs" HorizontalAlignment="Center">
+                            <Path Data="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm2-6h8v2H8v-2zm0-3h8v2H8v-2z"
+                                  Width="18" Height="18"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Bottom: Settings -->
+                    <StackPanel DockPanel.Dock="Bottom" Spacing="2" Margin="0,0,0,12" HorizontalAlignment="Center">
+                        <Button Classes="sidebar-btn" Tag="Settings" Click="OnNavClick"
+                                ToolTip.Tip="Settings" HorizontalAlignment="Center">
+                            <Path Data="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+                                  Width="18" Height="18"
+                                  Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
             </Border>
 
             <!-- Content Area -->
             <Panel Grid.Column="1" x:Name="ContentPanel" Background="{DynamicResource AppBackgroundBrush}"/>
         </Grid>
-
-        <!-- Status Bar -->
-        <Border Grid.Row="2" Background="{DynamicResource Surface0Brush}" Padding="12,6">
-            <Grid ColumnDefinitions="*,*,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16">
-                    <TextBlock Text="{DynamicResource StatusEverything}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
-                    <TextBlock Text="{Binding EverythingStatus}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
-                    <TextBlock Text="{DynamicResource StatusSyncthing}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
-                    <TextBlock Text="{Binding SyncthingStatus}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
-                </StackPanel>
-                <TextBlock Grid.Column="2" Text="{DynamicResource Version}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11"/>
-            </Grid>
-        </Border>
     </Grid>
-
-    <Window.Styles>
-        <Style Selector="Button.nav-btn">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="12,10"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-        <Style Selector="Button.nav-btn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource Surface2Brush}"/>
-        </Style>
-        <Style Selector="Button.nav-btn.active">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
-            <Setter Property="Foreground" Value="White"/>
-        </Style>
-    </Window.Styles>
 </Window>

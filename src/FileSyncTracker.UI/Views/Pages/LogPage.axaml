@@ -4,11 +4,14 @@
              x:Class="FileSyncTracker.UI.Views.Pages.LogPage"
              x:DataType="vm:LogViewModel">
 
-    <Border Padding="24">
+    <Border Padding="28,24">
         <Grid RowDefinitions="Auto,*">
-            <TextBlock Grid.Row="0" Text="{DynamicResource LogsTitle}" Classes="page-header" Margin="0,0,0,16"/>
+            <StackPanel Grid.Row="0" Margin="0,0,0,4">
+                <TextBlock Text="{DynamicResource LogsTitle}" Classes="page-header"/>
+                <TextBlock Text="Application logs" Classes="page-subtitle"/>
+            </StackPanel>
 
-            <Border Grid.Row="1" Classes="card">
+            <Border Grid.Row="1" Classes="table-container">
                 <ListBox ItemsSource="{Binding LogEntries}"
                          Background="Transparent" Foreground="{DynamicResource TextPrimaryBrush}"
                          FontFamily="Cascadia Code,Consolas" FontSize="12"/>

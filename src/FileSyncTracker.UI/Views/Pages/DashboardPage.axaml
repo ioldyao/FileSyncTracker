@@ -4,54 +4,68 @@
              x:Class="FileSyncTracker.UI.Views.Pages.DashboardPage"
              x:DataType="vm:DashboardViewModel">
 
-    <ScrollViewer Padding="24">
-        <StackPanel Spacing="20">
+    <ScrollViewer Padding="28,24">
+        <StackPanel Spacing="0">
             <!-- Header -->
             <TextBlock Text="{DynamicResource DashboardTitle}" Classes="page-header"/>
+            <TextBlock Text="Overview of your sync tasks" Classes="page-subtitle"/>
 
-            <!-- Stats Cards -->
-            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto">
+            <!-- Stats Row -->
+            <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,28">
                 <!-- Total Tasks -->
-                <Border Grid.Column="0" Classes="card" Margin="0,0,8,0">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{DynamicResource TotalTasks}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
-                        <TextBlock Text="{Binding TotalTasks}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="32" FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,24,0">
+                    <TextBlock Text="{DynamicResource TotalTasks}" Classes="table-header"/>
+                    <TextBlock Text="{Binding TotalTasks}" FontSize="32" FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                </StackPanel>
 
                 <!-- Syncing -->
-                <Border Grid.Column="1" Classes="card" Margin="4,0">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{DynamicResource Syncing}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
-                        <TextBlock Text="{Binding SyncingTasks}" Foreground="{DynamicResource InfoBrush}" FontSize="32" FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,24,0">
+                    <TextBlock Text="{DynamicResource Syncing}" Classes="table-header"/>
+                    <TextBlock Text="{Binding SyncingTasks}" FontSize="32" FontWeight="Bold"
+                               Foreground="{DynamicResource InfoBrush}"/>
+                </StackPanel>
 
                 <!-- Tracking -->
-                <Border Grid.Column="2" Classes="card" Margin="8,0,0,0">
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="{DynamicResource Tracking}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="13"/>
-                        <TextBlock Text="{Binding TrackingTasks}" Foreground="{DynamicResource WarningBrush}" FontSize="32" FontWeight="Bold"/>
-                    </StackPanel>
-                </Border>
+                <StackPanel Grid.Column="2" Spacing="4">
+                    <TextBlock Text="{DynamicResource Tracking}" Classes="table-header"/>
+                    <TextBlock Text="{Binding TrackingTasks}" FontSize="32" FontWeight="Bold"
+                               Foreground="{DynamicResource WarningBrush}"/>
+                </StackPanel>
             </Grid>
 
+            <Border Classes="divider"/>
+
             <!-- Recent Activity -->
-            <Border Classes="card">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="{DynamicResource RecentActivity}" FontSize="16" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock Text="{DynamicResource RecentActivity}" Classes="section-title" Margin="0,0,0,12"/>
+            <Border Classes="table-container">
+                <StackPanel>
+                    <!-- Table Header -->
+                    <Border Padding="12,8" Background="{DynamicResource Surface1Brush}">
+                    <Grid ColumnDefinitions="180,*,100,120">
+                        <TextBlock Grid.Column="0" Text="任务名称" Classes="table-header"/>
+                        <TextBlock Grid.Column="1" Text="路径" Classes="table-header"/>
+                        <TextBlock Grid.Column="2" Text="状态" Classes="table-header"/>
+                        <TextBlock Grid.Column="3" Text="上次同步" Classes="table-header"/>
+                    </Grid>
+                    </Border>
+                    <!-- Table Rows -->
                     <ItemsControl ItemsSource="{Binding RecentActivity}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{DynamicResource Surface3Brush}" CornerRadius="6" Padding="12,8" Margin="0,2">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Grid.Column="0" Spacing="2">
-                                            <TextBlock Text="{Binding Name}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="13"/>
-                                            <TextBlock Text="{Binding CurrentPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
-                                        <TextBlock Grid.Column="1" Text="{Binding LastSyncTime, StringFormat='{}{0:MM/dd HH:mm}'}"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" VerticalAlignment="Center"/>
+                                <Border Classes="table-row">
+                                    <Grid ColumnDefinitions="180,*,100,120">
+                                        <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="13"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding CurrentPath}" FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Status}" FontSize="12"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding LastSyncTime, StringFormat='{}{0:MM/dd HH:mm}'}"
+                                                   FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
