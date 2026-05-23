@@ -4,302 +4,366 @@
              x:Class="FileSyncTracker.UI.Views.Pages.SettingsPage"
              x:DataType="vm:SettingsViewModel">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,24">
-        <StackPanel Spacing="0" MaxWidth="720">
+    <Grid RowDefinitions="*,Auto">
 
-            <!-- Header -->
-            <TextBlock Text="{DynamicResource Settings}" Classes="page-header"/>
-            <TextBlock Text="Configure application settings" Classes="page-subtitle"/>
+        <!-- Scrollable content -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto" Padding="28,24,28,16">
+            <StackPanel Spacing="16" MaxWidth="720">
 
-            <!-- ========== Everything ========== -->
-            <TextBlock Text="Everything" Classes="section-title"/>
-            <StackPanel Spacing="10" Margin="0,0,0,20">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="{DynamicResource EverythingPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                    <TextBox Text="{Binding EverythingPath}" Classes="input"
-                             Watermark="C:\Program Files\Everything\Everything64.dll"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="Status:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding EverythingStatusText}" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                </StackPanel>
-            </StackPanel>
+                <!-- Header -->
+                <TextBlock Text="{DynamicResource Settings}" Classes="page-header"/>
+                <TextBlock Text="Configure application settings" Classes="page-subtitle"/>
 
-            <Border Classes="divider"/>
-
-            <!-- ========== Syncthing ========== -->
-            <TextBlock Text="Syncthing" Classes="section-title"/>
-            <StackPanel Spacing="10" Margin="0,0,0,20">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="{DynamicResource SyncthingPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                    <TextBox Text="{Binding SyncthingPath}" Classes="input"
-                             Watermark="C:\Program Files\Syncthing\syncthing.exe"/>
-                </StackPanel>
-                <StackPanel Spacing="4">
-                    <TextBlock Text="{DynamicResource SyncthingApiUrl}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                    <TextBox Text="{Binding SyncthingApiUrl}" Classes="input"
-                             Watermark="http://127.0.0.1:8384"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="Status:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding SyncthingStatusText}" FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center"/>
-                </StackPanel>
-            </StackPanel>
-
-            <Border Classes="divider"/>
-
-            <!-- ========== General ========== -->
-            <TextBlock Text="{DynamicResource General}" Classes="section-title"/>
-            <StackPanel Spacing="10" Margin="0,0,0,20">
-                <CheckBox Content="{DynamicResource MinimizeToTray}" IsChecked="{Binding MinimizeToTray}"/>
-                <CheckBox Content="{DynamicResource AutoStart}" IsChecked="{Binding AutoStart}"/>
-                <StackPanel Spacing="4">
-                    <TextBlock Text="{DynamicResource LogRetention}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                    <NumericUpDown Value="{Binding LogRetentionDays}" Minimum="1" Maximum="365"/>
-                </StackPanel>
-            </StackPanel>
-
-            <Border Classes="divider"/>
-
-            <!-- ========== WebDAV ========== -->
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,12" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource WebDavServers}" Classes="section-title" Margin="0" VerticalAlignment="Center"/>
-                <Button Content="{DynamicResource Add}" Classes="accent sm"
-                        VerticalAlignment="Center"
-                        Command="{Binding AddWebDavCommand}"/>
-            </StackPanel>
-
-            <!-- WebDAV Edit Form -->
-            <Border Classes="edit-form" IsVisible="{Binding IsEditingWebDav}" Margin="0,0,0,12">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Edit WebDAV Server" FontWeight="SemiBold" FontSize="14"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Name" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingWebDav.Name}" Classes="input" Watermark="e.g. Jianguoyun"/>
+                <!-- ===== 分类切换 Tab ===== -->
+                <Border Background="{DynamicResource Surface1Brush}" CornerRadius="8" Padding="4">
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <Button x:Name="TabGeneral" Content="基本设置" Classes="tab-pill"
+                                Click="OnTabClick" Tag="General" IsEnabled="False"/>
+                        <Button x:Name="TabLocalServices" Content="本地服务" Classes="tab-pill"
+                                Click="OnTabClick" Tag="LocalServices"/>
+                        <Button x:Name="TabCloudStorage" Content="云存储服务" Classes="tab-pill"
+                                Click="OnTabClick" Tag="CloudStorage"/>
                     </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="URL" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingWebDav.Url}" Classes="input" Watermark="https://dav.jianguoyun.com"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Username" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingWebDav.Username}" Classes="input"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Password" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingWebDav.Password}" Classes="input" PasswordChar="*"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingWebDav.RemotePath}" Classes="input" Watermark="/"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                        <Button Content="{DynamicResource Cancel}" Classes="secondary"
-                                Command="{Binding CancelWebDavCommand}"/>
-                        <Button Content="{DynamicResource Save}" Classes="accent"
-                                Command="{Binding SaveWebDavCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+                </Border>
 
-            <!-- WebDAV Server List -->
-            <Border Classes="table-container" Margin="0,0,0,20">
-                <StackPanel>
-                    <ItemsControl ItemsSource="{Binding WebDavServers}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Classes="table-row">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Grid.Column="0" Spacing="2">
-                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                            <TextBlock Text="{Binding Url}" FontSize="11"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <!-- ================================================================
+                     基本设置
+                ================================================================ -->
+                <Border x:Name="SectionGeneral" Classes="card" Padding="24">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="{DynamicResource General}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <Border Height="1" Background="{DynamicResource BorderBrush}"/>
+
+                        <CheckBox Content="{DynamicResource MinimizeToTray}" IsChecked="{Binding MinimizeToTray}"/>
+                        <CheckBox Content="{DynamicResource AutoStart}" IsChecked="{Binding AutoStart}"/>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="{DynamicResource LogRetention}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                            <NumericUpDown Value="{Binding LogRetentionDays}" Minimum="1" Maximum="365"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ================================================================
+                     本地服务
+                ================================================================ -->
+                <Border x:Name="SectionLocalServices" Classes="card" Padding="24" IsVisible="False">
+                    <StackPanel Spacing="20">
+                        <TextBlock Text="本地服务" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <Border Height="1" Background="{DynamicResource BorderBrush}"/>
+
+                        <!-- Everything -->
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Everything" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource EverythingPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding EverythingPath}" Classes="input"
+                                         Watermark="C:\Program Files\Everything\Everything64.dll"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Status:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding EverythingStatusText}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <Border Height="1" Background="{DynamicResource BorderBrush}"/>
+
+                        <!-- Syncthing -->
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Syncthing" FontSize="14" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource SyncthingPath}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding SyncthingPath}" Classes="input"
+                                         Watermark="C:\Program Files\Syncthing\syncthing.exe"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="{DynamicResource SyncthingApiUrl}" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                <TextBox Text="{Binding SyncthingApiUrl}" Classes="input"
+                                         Watermark="http://127.0.0.1:8384"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Status:" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding SyncthingStatusText}" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- ================================================================
+                     云存储服务
+                ================================================================ -->
+                <Border x:Name="SectionCloudStorage" Classes="card" Padding="24" IsVisible="False">
+                    <StackPanel Spacing="24">
+                        <TextBlock Text="云存储服务" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <Border Height="1" Background="{DynamicResource BorderBrush}"/>
+
+                        <!-- ===== WebDAV ===== -->
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="Auto,Auto,*">
+                                <TextBlock Grid.Column="0" Text="WebDAV" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Classes="badge" Background="{DynamicResource AccentSubtleBrush}" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding WebDavServers.Count}" FontSize="11"
+                                               Foreground="{DynamicResource AccentBrush}"/>
+                                </Border>
+                                <Button Grid.Column="2" Content="{DynamicResource Add}" Classes="accent sm"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Command="{Binding AddWebDavCommand}"/>
+                            </Grid>
+
+                            <Border Classes="edit-form" IsVisible="{Binding IsEditingWebDav}" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Name" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingWebDav.Name}" Classes="input" Watermark="e.g. Jianguoyun"/>
+                                    </StackPanel>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="URL" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingWebDav.Url}" Classes="input" Watermark="https://dav.jianguoyun.com"/>
+                                    </StackPanel>
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="Username" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                            <TextBox Text="{Binding EditingWebDav.Username}" Classes="input"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-                                            <Button Content="{DynamicResource Edit}" Classes="secondary sm"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.EditWebDavCommand}"
-                                                    CommandParameter="{Binding}"/>
-                                            <Button Content="{DynamicResource Del}" Classes="danger sm"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.DeleteWebDavCommand}"
-                                                    CommandParameter="{Binding}"/>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Password" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                            <TextBox Text="{Binding EditingWebDav.Password}" Classes="input" PasswordChar="*"/>
                                         </StackPanel>
                                     </Grid>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingWebDav.RemotePath}" Classes="input" Watermark="/"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                        <Button Content="{DynamicResource Cancel}" Classes="secondary"
+                                                Command="{Binding CancelWebDavCommand}"/>
+                                        <Button Content="{DynamicResource Save}" Classes="accent"
+                                                Command="{Binding SaveWebDavCommand}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Classes="table-container">
+                                <StackPanel>
+                                    <ItemsControl ItemsSource="{Binding WebDavServers}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Classes="table-row">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <StackPanel Grid.Column="0" Spacing="2">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
+                                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="{Binding Url}" FontSize="11"
+                                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                                            <Button Content="{DynamicResource Edit}" Classes="secondary sm"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.EditWebDavCommand}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="{DynamicResource Del}" Classes="danger sm"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.DeleteWebDavCommand}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="没有配置服务器" Foreground="{DynamicResource TextSecondaryBrush}"
+                                               IsVisible="{Binding !WebDavServers.Count}" Padding="12,8"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <Border Height="1" Background="{DynamicResource BorderBrush}"/>
+
+                        <!-- ===== OneDrive ===== -->
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="Auto,Auto,*">
+                                <TextBlock Grid.Column="0" Text="OneDrive" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Classes="badge" Background="{DynamicResource AccentSubtleBrush}" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding OneDriveAccounts.Count}" FontSize="11"
+                                               Foreground="{DynamicResource AccentBrush}"/>
                                 </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <TextBlock Text="No servers configured" Foreground="{DynamicResource TextSecondaryBrush}"
-                               IsVisible="{Binding !WebDavServers.Count}" Padding="12,8"/>
-                </StackPanel>
-            </Border>
+                                <Button Grid.Column="2" Content="{DynamicResource Add}" Classes="accent sm"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Command="{Binding AddOneDriveCommand}"/>
+                            </Grid>
 
-            <Border Classes="divider"/>
+                            <Border Classes="edit-form" IsVisible="{Binding IsEditingOneDrive}" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Account Name" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingOneDrive.Name}" Classes="input" Watermark="e.g. Personal OneDrive"/>
+                                    </StackPanel>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Access Token" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingOneDrive.AccessToken}" Classes="input" PasswordChar="*"/>
+                                    </StackPanel>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Refresh Token" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingOneDrive.RefreshToken}" Classes="input" PasswordChar="*"/>
+                                    </StackPanel>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingOneDrive.RemotePath}" Classes="input" Watermark="/"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                        <Button Content="{DynamicResource Cancel}" Classes="secondary"
+                                                Command="{Binding CancelOneDriveCommand}"/>
+                                        <Button Content="{DynamicResource Save}" Classes="accent"
+                                                Command="{Binding SaveOneDriveCommand}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
 
-            <!-- ========== OneDrive ========== -->
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,12" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource OneDriveAccounts}" Classes="section-title" Margin="0" VerticalAlignment="Center"/>
-                <Button Content="{DynamicResource Add}" Classes="accent sm"
-                        VerticalAlignment="Center"
-                        Command="{Binding AddOneDriveCommand}"/>
-            </StackPanel>
+                            <Border Classes="table-container">
+                                <StackPanel>
+                                    <ItemsControl ItemsSource="{Binding OneDriveAccounts}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Classes="table-row">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <StackPanel Grid.Column="0" Spacing="2">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
+                                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="OneDrive Account" FontSize="11"
+                                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                                            <Button Content="{DynamicResource Edit}" Classes="secondary sm"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.EditOneDriveCommand}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="{DynamicResource Del}" Classes="danger sm"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.DeleteOneDriveCommand}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="没有配置账户" Foreground="{DynamicResource TextSecondaryBrush}"
+                                               IsVisible="{Binding !OneDriveAccounts.Count}" Padding="12,8"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-            <!-- OneDrive Edit Form -->
-            <Border Classes="edit-form" IsVisible="{Binding IsEditingOneDrive}" Margin="0,0,0,12">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Edit OneDrive Account" FontWeight="SemiBold" FontSize="14"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Account Name" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingOneDrive.Name}" Classes="input" Watermark="e.g. Personal OneDrive"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Access Token" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingOneDrive.AccessToken}" Classes="input" PasswordChar="*"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Refresh Token" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingOneDrive.RefreshToken}" Classes="input" PasswordChar="*"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingOneDrive.RemotePath}" Classes="input" Watermark="/"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                        <Button Content="{DynamicResource Cancel}" Classes="secondary"
-                                Command="{Binding CancelOneDriveCommand}"/>
-                        <Button Content="{DynamicResource Save}" Classes="accent"
-                                Command="{Binding SaveOneDriveCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
+                        <Border Height="1" Background="{DynamicResource BorderBrush}"/>
 
-            <!-- OneDrive Account List -->
-            <Border Classes="table-container" Margin="0,0,0,20">
-                <StackPanel>
-                    <ItemsControl ItemsSource="{Binding OneDriveAccounts}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Classes="table-row">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Grid.Column="0" Spacing="2">
-                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                            <TextBlock Text="OneDrive Account" FontSize="11"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <!-- ===== S3 ===== -->
+                        <StackPanel Spacing="12">
+                            <Grid ColumnDefinitions="Auto,Auto,*">
+                                <TextBlock Grid.Column="0" Text="S3" FontSize="14" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Classes="badge" Background="{DynamicResource AccentSubtleBrush}" Margin="8,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding S3Servers.Count}" FontSize="11"
+                                               Foreground="{DynamicResource AccentBrush}"/>
+                                </Border>
+                                <Button Grid.Column="2" Content="{DynamicResource Add}" Classes="accent sm"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        Command="{Binding AddS3Command}"/>
+                            </Grid>
+
+                            <Border Classes="edit-form" IsVisible="{Binding IsEditingS3}" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="Name" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                            <TextBox Text="{Binding EditingS3.Name}" Classes="input" Watermark="e.g. Aliyun OSS"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-                                            <Button Content="{DynamicResource Edit}" Classes="secondary sm"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.EditOneDriveCommand}"
-                                                    CommandParameter="{Binding}"/>
-                                            <Button Content="{DynamicResource Del}" Classes="danger sm"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.DeleteOneDriveCommand}"
-                                                    CommandParameter="{Binding}"/>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Region" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                            <TextBox Text="{Binding EditingS3.Region}" Classes="input" Watermark="cn-hangzhou"/>
                                         </StackPanel>
                                     </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <TextBlock Text="No accounts configured" Foreground="{DynamicResource TextSecondaryBrush}"
-                               IsVisible="{Binding !OneDriveAccounts.Count}" Padding="12,8"/>
-                </StackPanel>
-            </Border>
-
-            <Border Classes="divider"/>
-
-            <!-- ========== S3 ========== -->
-            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,0,0,12" VerticalAlignment="Center">
-                <TextBlock Text="{DynamicResource S3Servers}" Classes="section-title" Margin="0" VerticalAlignment="Center"/>
-                <Button Content="{DynamicResource Add}" Classes="accent sm"
-                        VerticalAlignment="Center"
-                        Command="{Binding AddS3Command}"/>
-            </StackPanel>
-
-            <!-- S3 Edit Form -->
-            <Border Classes="edit-form" IsVisible="{Binding IsEditingS3}" Margin="0,0,0,12">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="Edit S3 Storage" FontWeight="SemiBold" FontSize="14"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Name" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.Name}" Classes="input" Watermark="e.g. Aliyun OSS"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Endpoint" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.Endpoint}" Classes="input" Watermark="https://oss-cn-hangzhou.aliyuncs.com"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Bucket" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.Bucket}" Classes="input"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Access Key" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.AccessKey}" Classes="input"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Secret Key" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.SecretKey}" Classes="input" PasswordChar="*"/>
-                    </StackPanel>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Region" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.Region}" Classes="input" Watermark="cn-hangzhou"/>
-                    </StackPanel>
-                    <CheckBox Content="Use Path Style" IsChecked="{Binding EditingS3.UsePathStyle}"/>
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
-                        <TextBox Text="{Binding EditingS3.RemotePath}" Classes="input" Watermark="/"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                        <Button Content="{DynamicResource Cancel}" Classes="secondary"
-                                Command="{Binding CancelS3Command}"/>
-                        <Button Content="{DynamicResource Save}" Classes="accent"
-                                Command="{Binding SaveS3Command}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- S3 Server List -->
-            <Border Classes="table-container" Margin="0,0,0,20">
-                <StackPanel>
-                    <ItemsControl ItemsSource="{Binding S3Servers}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Classes="table-row">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Grid.Column="0" Spacing="2">
-                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                            <TextBlock Text="{Binding Bucket}" FontSize="11"
-                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Endpoint" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingS3.Endpoint}" Classes="input" Watermark="https://oss-cn-hangzhou.aliyuncs.com"/>
+                                    </StackPanel>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Bucket" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingS3.Bucket}" Classes="input"/>
+                                    </StackPanel>
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                        <StackPanel Grid.Column="0" Spacing="4">
+                                            <TextBlock Text="Access Key" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                            <TextBox Text="{Binding EditingS3.AccessKey}" Classes="input"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-                                            <Button Content="{DynamicResource Edit}" Classes="secondary sm"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.EditS3Command}"
-                                                    CommandParameter="{Binding}"/>
-                                            <Button Content="{DynamicResource Del}" Classes="danger sm"
-                                                    Command="{Binding $parent[ItemsControl].DataContext.DeleteS3Command}"
-                                                    CommandParameter="{Binding}"/>
+                                        <StackPanel Grid.Column="1" Spacing="4">
+                                            <TextBlock Text="Secret Key" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                            <TextBox Text="{Binding EditingS3.SecretKey}" Classes="input" PasswordChar="*"/>
                                         </StackPanel>
                                     </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <TextBlock Text="No servers configured" Foreground="{DynamicResource TextSecondaryBrush}"
-                               IsVisible="{Binding !S3Servers.Count}" Padding="12,8"/>
-                </StackPanel>
-            </Border>
+                                    <CheckBox Content="Use Path Style" IsChecked="{Binding EditingS3.UsePathStyle}"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Remote Path" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12"/>
+                                        <TextBox Text="{Binding EditingS3.RemotePath}" Classes="input" Watermark="/"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                        <Button Content="{DynamicResource Cancel}" Classes="secondary"
+                                                Command="{Binding CancelS3Command}"/>
+                                        <Button Content="{DynamicResource Save}" Classes="accent"
+                                                Command="{Binding SaveS3Command}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
 
-            <!-- Save Button -->
+                            <Border Classes="table-container">
+                                <StackPanel>
+                                    <ItemsControl ItemsSource="{Binding S3Servers}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Classes="table-row">
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <StackPanel Grid.Column="0" Spacing="2">
+                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
+                                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                            <TextBlock Text="{Binding Bucket}" FontSize="11"
+                                                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                                            <Button Content="{DynamicResource Edit}" Classes="secondary sm"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.EditS3Command}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="{DynamicResource Del}" Classes="danger sm"
+                                                                    Command="{Binding $parent[ItemsControl].DataContext.DeleteS3Command}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="没有配置服务器" Foreground="{DynamicResource TextSecondaryBrush}"
+                                               IsVisible="{Binding !S3Servers.Count}" Padding="12,8"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Fixed bottom bar: Save Settings -->
+        <Border Grid.Row="1" Padding="28,12" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource Surface0Brush}">
             <Button Content="{DynamicResource SaveSettings}" Classes="accent"
-                    HorizontalAlignment="Right" Padding="24,8"
+                    HorizontalAlignment="Right" Padding="24,10"
                     Command="{Binding SaveSettingsCommand}"/>
+        </Border>
 
-        </StackPanel>
-    </ScrollViewer>
+    </Grid>
 
 </UserControl>

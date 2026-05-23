@@ -27,6 +27,22 @@ public partial class SettingsPage : UserControl
             await _vm.InitializeAsync();
     }
 
+    private void OnTabClick(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is string tag)
+        {
+            // Show selected section, hide others
+            SectionGeneral.IsVisible = tag == "General";
+            SectionLocalServices.IsVisible = tag == "LocalServices";
+            SectionCloudStorage.IsVisible = tag == "CloudStorage";
+
+            // Update tab states
+            TabGeneral.IsEnabled = tag != "General";
+            TabLocalServices.IsEnabled = tag != "LocalServices";
+            TabCloudStorage.IsEnabled = tag != "CloudStorage";
+        }
+    }
+
     private async void OnSaveClick(object? sender, RoutedEventArgs e)
     {
         var logDir = Path.Combine(
