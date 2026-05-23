@@ -26,6 +26,12 @@ public partial class MainWindow : Window
         _instance = this;
         InitializeComponent();
         ShowPage("Dashboard");
+
+        // Set corner resize cursors (diagonal cursors not available in this Avalonia version)
+        ResizeNorthWest.Cursor = new Cursor(StandardCursorType.SizeAll);
+        ResizeNorthEast.Cursor = new Cursor(StandardCursorType.SizeAll);
+        ResizeSouthWest.Cursor = new Cursor(StandardCursorType.SizeAll);
+        ResizeSouthEast.Cursor = new Cursor(StandardCursorType.SizeAll);
     }
 
     private void OnNavClick(object? sender, RoutedEventArgs e)
@@ -99,5 +105,25 @@ public partial class MainWindow : Window
     private void OnCloseClick(object? sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void OnResizePress(object? sender, PointerPressedEventArgs e)
+    {
+        if (sender is Border { Tag: string edge })
+        {
+            var windowEdge = edge switch
+            {
+                "North" => WindowEdge.North,
+                "South" => WindowEdge.South,
+                "West" => WindowEdge.West,
+                "East" => WindowEdge.East,
+                "NorthWest" => WindowEdge.NorthWest,
+                "NorthEast" => WindowEdge.NorthEast,
+                "SouthWest" => WindowEdge.SouthWest,
+                "SouthEast" => WindowEdge.SouthEast,
+                _ => WindowEdge.SouthEast
+            };
+            BeginResizeDrag(windowEdge, e);
+        }
     }
 }

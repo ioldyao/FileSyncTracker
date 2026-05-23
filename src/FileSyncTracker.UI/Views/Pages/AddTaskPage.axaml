@@ -42,19 +42,19 @@
                         <StackPanel Spacing="16" IsVisible="{Binding CurrentStep, Converter={x:Static local:IntToBoolConverter.Instance}, ConverterParameter=1}">
                             <TextBlock Text="{DynamicResource SelectTaskType}" Classes="section-title"/>
                             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                                <Border Grid.Column="0" CornerRadius="10" Padding="20" Margin="0,0,8,0"
+                                <Border Grid.Column="0" Margin="0,0,8,0"
                                         Cursor="Hand" PointerPressed="OnFolderSelected"
-                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                        Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=Folder}">
+                                        Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=Folder}"
+                                        Classes="step-card">
                                     <StackPanel HorizontalAlignment="Center" Spacing="10">
                                         <TextBlock Text="📁" FontSize="36" HorizontalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource FolderType}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14" HorizontalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
-                                <Border Grid.Column="1" CornerRadius="10" Padding="20" Margin="8,0,0,0"
+                                <Border Grid.Column="1" Margin="8,0,0,0"
                                         Cursor="Hand" PointerPressed="OnFileSelected"
-                                        BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                        Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=File}">
+                                        Background="{Binding SelectedType, Converter={x:Static local:TypeToSelectionConverter.Instance}, ConverterParameter=File}"
+                                        Classes="step-card">
                                     <StackPanel HorizontalAlignment="Center" Spacing="10">
                                         <TextBlock Text="📄" FontSize="36" HorizontalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource SingleFileType}" Foreground="{DynamicResource TextPrimaryBrush}" FontSize="14" HorizontalAlignment="Center"/>
@@ -98,9 +98,7 @@
                             </StackPanel>
 
                             <!-- No servers configured hint -->
-                            <Border Background="{DynamicResource Surface2Brush}" CornerRadius="8" Padding="12"
-                                    BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"
-                                    IsVisible="{Binding !HasAnyCloud}">
+                            <Border Classes="info-banner" IsVisible="{Binding !HasAnyCloud}">
                                 <TextBlock Text="{DynamicResource NoCloudConfigured}"
                                            FontSize="12" Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap"/>
                             </Border>
@@ -169,9 +167,7 @@
                             </StackPanel>
 
                             <!-- Selected targets summary -->
-                            <Border CornerRadius="8" Padding="12"
-                                    Background="{DynamicResource AccentSubtleBrush}"
-                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                            <Border Classes="info-banner">
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="{DynamicResource SelectedTargets}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
                                     <TextBlock Text="{Binding SelectedTargets.Count}" FontSize="12" Foreground="{DynamicResource AccentBrush}"/>
@@ -205,7 +201,7 @@
                     <Button Content="{DynamicResource Next}" Classes="accent"
                             IsVisible="{Binding CurrentStep, Converter={x:Static local:LessThanFourConverter.Instance}}"
                             Click="OnNextStepClick"/>
-                    <Button Content="{DynamicResource Create}" Classes="success"
+                    <Button Content="{DynamicResource Create}" Classes="accent"
                             FontWeight="SemiBold"
                             IsVisible="{Binding CurrentStep, Converter={x:Static local:EqualToFourConverter.Instance}}"
                             Click="OnCreateClick"/>

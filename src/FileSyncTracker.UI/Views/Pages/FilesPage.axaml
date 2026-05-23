@@ -47,7 +47,7 @@
                                 <Border Classes="table-container">
                                     <StackPanel>
                                         <!-- Table Header -->
-                                        <Border Padding="12,8" Background="{DynamicResource Surface1Brush}">
+                                        <Border Classes="table-header-row">
                                         <Grid ColumnDefinitions="*,100,140,120,70">
                                             <TextBlock Grid.Column="0" Text="文件名" Classes="table-header"/>
                                             <TextBlock Grid.Column="1" Text="大小" Classes="table-header"/>

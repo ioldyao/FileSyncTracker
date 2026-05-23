@@ -72,9 +72,7 @@
             </StackPanel>
 
             <!-- WebDAV Edit Form -->
-            <Border BorderBrush="{DynamicResource FocusBrush}" BorderThickness="1" CornerRadius="8"
-                    Padding="16" Margin="0,0,0,12" IsVisible="{Binding IsEditingWebDav}"
-                    Background="{DynamicResource Surface1Brush}">
+            <Border Classes="edit-form" IsVisible="{Binding IsEditingWebDav}" Margin="0,0,0,12">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Edit WebDAV Server" FontWeight="SemiBold" FontSize="14"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -150,9 +148,7 @@
             </StackPanel>
 
             <!-- OneDrive Edit Form -->
-            <Border BorderBrush="{DynamicResource FocusBrush}" BorderThickness="1" CornerRadius="8"
-                    Padding="16" Margin="0,0,0,12" IsVisible="{Binding IsEditingOneDrive}"
-                    Background="{DynamicResource Surface1Brush}">
+            <Border Classes="edit-form" IsVisible="{Binding IsEditingOneDrive}" Margin="0,0,0,12">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Edit OneDrive Account" FontWeight="SemiBold" FontSize="14"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -224,9 +220,7 @@
             </StackPanel>
 
             <!-- S3 Edit Form -->
-            <Border BorderBrush="{DynamicResource FocusBrush}" BorderThickness="1" CornerRadius="8"
-                    Padding="16" Margin="0,0,0,12" IsVisible="{Binding IsEditingS3}"
-                    Background="{DynamicResource Surface1Brush}">
+            <Border Classes="edit-form" IsVisible="{Binding IsEditingS3}" Margin="0,0,0,12">
                 <StackPanel Spacing="10">
                     <TextBlock Text="Edit S3 Storage" FontWeight="SemiBold" FontSize="14"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
@@ -302,7 +296,8 @@
 
             <!-- Save Button -->
             <Button Content="{DynamicResource SaveSettings}" Classes="accent"
-                    HorizontalAlignment="Right" Padding="24,8"/>
+                    HorizontalAlignment="Right" Padding="24,8"
+                    Command="{Binding SaveSettingsCommand}"/>
 
         </StackPanel>
     </ScrollViewer>

@@ -12,36 +12,38 @@
 
             <!-- Stats Row -->
             <Grid ColumnDefinitions="*,*,*" Margin="0,0,0,28">
-                <!-- Total Tasks -->
-                <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,24,0">
-                    <TextBlock Text="{DynamicResource TotalTasks}" Classes="table-header"/>
-                    <TextBlock Text="{Binding TotalTasks}" FontSize="32" FontWeight="Bold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
-                </StackPanel>
+                <Border Grid.Column="0" Classes="stat-card" Margin="0,0,12,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource TotalTasks}" Classes="table-header"/>
+                        <TextBlock Text="{Binding TotalTasks}" Classes="stat-value"/>
+                    </StackPanel>
+                </Border>
 
-                <!-- Syncing -->
-                <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,24,0">
-                    <TextBlock Text="{DynamicResource Syncing}" Classes="table-header"/>
-                    <TextBlock Text="{Binding SyncingTasks}" FontSize="32" FontWeight="Bold"
-                               Foreground="{DynamicResource InfoBrush}"/>
-                </StackPanel>
+                <Border Grid.Column="1" Classes="stat-card" Margin="6,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Syncing}" Classes="table-header"/>
+                        <TextBlock Text="{Binding SyncingTasks}" Classes="stat-value"
+                                   Foreground="{DynamicResource InfoBrush}"/>
+                    </StackPanel>
+                </Border>
 
-                <!-- Tracking -->
-                <StackPanel Grid.Column="2" Spacing="4">
-                    <TextBlock Text="{DynamicResource Tracking}" Classes="table-header"/>
-                    <TextBlock Text="{Binding TrackingTasks}" FontSize="32" FontWeight="Bold"
-                               Foreground="{DynamicResource WarningBrush}"/>
-                </StackPanel>
+                <Border Grid.Column="2" Classes="stat-card" Margin="12,0,0,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Tracking}" Classes="table-header"/>
+                        <TextBlock Text="{Binding TrackingTasks}" Classes="stat-value"
+                                   Foreground="{DynamicResource WarningBrush}"/>
+                    </StackPanel>
+                </Border>
             </Grid>
 
             <Border Classes="divider"/>
 
             <!-- Recent Activity -->
-            <TextBlock Text="{DynamicResource RecentActivity}" Classes="section-title" Margin="0,0,0,12"/>
+            <TextBlock Text="{DynamicResource RecentActivity}" Classes="section-title"/>
             <Border Classes="table-container">
                 <StackPanel>
                     <!-- Table Header -->
-                    <Border Padding="12,8" Background="{DynamicResource Surface1Brush}">
+                    <Border Classes="table-header-row">
                     <Grid ColumnDefinitions="180,*,100,120">
                         <TextBlock Grid.Column="0" Text="任务名称" Classes="table-header"/>
                         <TextBlock Grid.Column="1" Text="路径" Classes="table-header"/>

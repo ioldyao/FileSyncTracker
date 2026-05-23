@@ -22,7 +22,7 @@
             <Border Grid.Row="1" Classes="table-container">
                 <StackPanel>
                     <!-- Table Header -->
-                    <Border Padding="12,8" Background="{DynamicResource Surface1Brush}">
+                    <Border Classes="table-header-row">
                     <Grid ColumnDefinitions="40,140,*,90,120,Auto">
                         <TextBlock Grid.Column="0" Text="" Classes="table-header"/>
                         <TextBlock Grid.Column="1" Text="名称" Classes="table-header"/>
